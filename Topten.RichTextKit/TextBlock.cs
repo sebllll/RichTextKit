@@ -373,15 +373,17 @@ namespace Topten.RichTextKit
                 // Break font runs into lines
                 BreakLines();
 
+                AdjustHyphens();
+
                 // Finalize lines
                 FinalizeLines();
             }
         }
 
-/// <summary>
-/// Get the text runs as added by AddText
-/// </summary>
-public IReadOnlyList<StyleRun> StyleRuns
+        /// <summary>
+        /// Get the text runs as added by AddText
+        /// </summary>
+        public IReadOnlyList<StyleRun> StyleRuns
         {
             get
             {
@@ -1757,6 +1759,48 @@ public IReadOnlyList<StyleRun> StyleRuns
             line.Width = xPos - trailingWhitespaceWidth;
 
             return _maxWidthResolved - (xPos - trailingWhitespaceWidth);
+        }
+
+        void AdjustHyphens()
+        {
+
+            List<int> lineEnds = new List<int>();
+            foreach (var l in _lines)
+            {
+                lineEnds.Add(l.End);
+
+                //for (int i = l.Start; i < l.End -1; i++ )
+                //{
+                //    if (_codePoints[i] == 173)
+                //    {
+                //        _codePoints[i] = 0;
+                //    }
+                //}
+
+                //if (_codePoints[l.End -1] == 173)
+                //    _codePoints[l.End -1] = 45;
+            }
+
+            foreach (var fr in FontRuns)
+            {
+                //var l = fr.Line;
+                //var g = fr.Glyphs;
+                //foreach (var g in fr.Glyphs)
+                //{
+                    
+                //}
+                for (int i = 0; i < fr.Glyphs.Length; i++)
+                {
+                    if (fr.Glyphs[i] == 3)
+                    {
+                        if (lineEnds.Contains(i + 1 + fr.Glyphs.Start))
+                            fr.Glyphs[i] = 16;
+                        //else
+                        //    fr.Glyphs[i] = 0;
+                    }
+                }
+
+            }
         }
 
         /// <summary>
