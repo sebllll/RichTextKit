@@ -337,6 +337,45 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 173 (the default unicode SoftHyphen)
+        /// </remarks>
+        public int? SoftHyphenCharacter
+        {
+            get => _softHyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value > 0)
+                {
+                    _softHyphenCharacter = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Character that is being used as Hyphen.
+        /// When Hyphenation should take place, the <see cref="SoftHyphenCharacter"/> gets replaced with this one
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default Glyphinfo for a Hyphen)
+        /// </remarks>
+        public ushort? HyphenCharacter
+        {
+            get => _hyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value > 0)
+                {
+                    _hyphenCharacter = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
         /// The maximum number of lines after which lines will be 
         /// truncated and the final line will be appended with an 
         /// ellipsis (`...`) character.
@@ -733,6 +772,8 @@ namespace Topten.RichTextKit
                 baseDirection = _baseDirection,
                 styleManager = StyleManager.Default,
                 previousParagraph = null,
+                softHyphenCharacter = _softHyphenCharacter,
+                hyphenCharacter = _hyphenCharacter,
             };
 
             // Setup style manager
@@ -790,6 +831,8 @@ namespace Topten.RichTextKit
             public ParagraphInfo previousParagraph;
             public int MeasuredLength;
             public int TotalLength;
+            public int? softHyphenCharacter;
+            public ushort? hyphenCharacter;
         }
 
 
@@ -810,6 +853,8 @@ namespace Topten.RichTextKit
         float? _maxWidth;
         float? _maxHeight;
         int? _maxLines;
+        int? _softHyphenCharacter;
+        ushort? _hyphenCharacter;
         TextAlignment _textAlignment;
         TextDirection _baseDirection;
         IStyle _baseStyle;
@@ -1010,6 +1055,26 @@ namespace Topten.RichTextKit
                     Truncated = true;
                     ctx.Truncated = true;
                     return;
+                }
+
+                // Setup SoftHyphenation Characters
+                if (ctx.softHyphenCharacter.HasValue)
+                {
+                    TextBlock.SoftHyphenCharacter = ctx.softHyphenCharacter.Value;
+                }
+                else
+                {
+                    TextBlock.SoftHyphenCharacter = 173;
+                }
+
+                // Setup Hyphenation Characters
+                if (ctx.hyphenCharacter.HasValue)
+                {
+                    TextBlock.HyphenCharacter = ctx.hyphenCharacter.Value;
+                }
+                else
+                {
+                    TextBlock.HyphenCharacter = 16;
                 }
 
                 // Update the yPosition and stop further processing if truncated

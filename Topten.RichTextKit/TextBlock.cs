@@ -108,6 +108,50 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 173 (the default unicode SoftHyphen)
+        /// </remarks>
+        public int? SoftHyphenCharacter
+        {
+            get => _softHyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value < 0)
+                    value = 173;
+
+                if (value.HasValue && value != _softHyphenCharacter)
+                {
+                    _softHyphenCharacter = value.Value;
+                    InvalidateLayout();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default glyphInfo for Hyphen)
+        /// </remarks>
+        public ushort? HyphenCharacter
+        {
+            get => _hyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value < 0)
+                    value = 16;
+
+                if (value.HasValue && value != _hyphenCharacter)
+                {
+                    _hyphenCharacter = value.Value;
+                    InvalidateLayout();
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets the left, right or center alignment of the text block.
         /// </summary>
         /// <remarks>
@@ -936,6 +980,16 @@ namespace Topten.RichTextKit
         int _maxLinesResolved = int.MaxValue;
 
         /// <summary>
+        /// The Character that represents a SoftHyphen
+        /// </summary>
+        int _softHyphenCharacter = 173;
+
+        /// <summary>
+        /// The Character that represents a SoftHyphen
+        /// </summary>
+        ushort _hyphenCharacter = 16;
+
+        /// <summary>
         /// Text alignment
         /// </summary>
         TextAlignment _textAlignment = TextAlignment.Auto;
@@ -1761,9 +1815,12 @@ namespace Topten.RichTextKit
             return _maxWidthResolved - (xPos - trailingWhitespaceWidth);
         }
 
-        void AdjustHyphens()
+        /// <summary>
+        /// replace a given SoftHyphen Character at a lineEnd with a given Hyphen Character
+        /// Also Shift The Whole Line a bit to the left, when Centered or Right 
+        /// </summary>
+        private void AdjustHyphens()
         {
-
             List<int> lineEndings = new List<int>();
             foreach (var l in _lines)
             {
@@ -1775,7 +1832,7 @@ namespace Topten.RichTextKit
                 for (int i = 0; i < fr.Glyphs.Length; i++)
                 {
                     //if (fr.Glyphs[i] == 3)
-                    if (fr.CodePoints[i] == 173)
+                    if (fr.CodePoints[i] == _softHyphenCharacter) // 173 is a SoftHyphen
                     {
                         var glyphPosIndex = i + 1 + fr.Glyphs.Start;
 
@@ -1783,26 +1840,35 @@ namespace Topten.RichTextKit
                                                 .Where(list => list.character == glyphPosIndex)
                                                 .ToList();
 
-                        if (lineEndingIndicies.Count > 0)
+                        // when the SoftHyphen was at a lineEnding
+                        if (lineEndingIndicies.Count > 0) 
                         {
-                            fr.Glyphs[i] = 16;
+                            // replace it with a Hyphen
+                            fr.Glyphs[i] = _hyphenCharacter;
 
-                            foreach (var lei in lineEndingIndicies)
+                            // shift the XCoords of that line a bit to the left if Right or Centered
+                            var ta = ResolveTextAlignment();
+                            switch (ta)
                             {
-                                foreach (var foru in _lines[lei.index].Runs)
-                                {
-                                    var ta = ResolveTextAlignment();
-                                    switch (ta)
+                                case TextAlignment.Center:
+                                    foreach (var lei in lineEndingIndicies)
                                     {
-                                        // move line to left by width of "-" + LetterSpacing if not left aligned
-                                        case TextAlignment.Center:
-                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing/2;
-                                            break;
-                                        case TextAlignment.Right:
-                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing;
-                                            break;
+                                        foreach (var foru in _lines[lei.index].Runs)
+                                        {
+                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing / 2;
+                                        }
                                     }
-                                }
+                                    break;
+
+                                case TextAlignment.Right:
+                                    foreach (var lei in lineEndingIndicies)
+                                    {
+                                        foreach (var foru in _lines[lei.index].Runs)
+                                        {
+                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing;
+                                        }
+                                    }
+                                    break;
                             }
                         }
                     }
