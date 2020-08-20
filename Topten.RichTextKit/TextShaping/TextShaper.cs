@@ -332,7 +332,10 @@ namespace Topten.RichTextKit
                     cursorX += pos.XAdvance * glyphScale;
                     cursorY += pos.YAdvance * glyphScale;
 
-                    if (i+1 == gi.Length || gi[i].Cluster != gi[i+1].Cluster)
+
+                    bool isSoftHyphen = r.GlyphIndicies.Underlying[i] == 3 && gp[i].XAdvance == 0;
+
+                    if (!isSoftHyphen && (i + 1 == gi.Length || gi[i].Cluster != gi[i+1].Cluster))
                     {
                         cursorX += style.LetterSpacing;
                     }
