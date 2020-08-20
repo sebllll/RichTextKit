@@ -1764,42 +1764,49 @@ namespace Topten.RichTextKit
         void AdjustHyphens()
         {
 
-            List<int> lineEnds = new List<int>();
+            List<int> lineEndings = new List<int>();
             foreach (var l in _lines)
             {
-                lineEnds.Add(l.End);
-
-                //for (int i = l.Start; i < l.End -1; i++ )
-                //{
-                //    if (_codePoints[i] == 173)
-                //    {
-                //        _codePoints[i] = 0;
-                //    }
-                //}
-
-                //if (_codePoints[l.End -1] == 173)
-                //    _codePoints[l.End -1] = 45;
+                lineEndings.Add(l.End);
             }
 
             foreach (var fr in FontRuns)
             {
-                //var l = fr.Line;
-                //var g = fr.Glyphs;
-                //foreach (var g in fr.Glyphs)
-                //{
-                    
-                //}
                 for (int i = 0; i < fr.Glyphs.Length; i++)
                 {
-                    if (fr.Glyphs[i] == 3)
+                    //if (fr.Glyphs[i] == 3)
+                    if (fr.CodePoints[i] == 173)
                     {
-                        if (lineEnds.Contains(i + 1 + fr.Glyphs.Start))
+                        var glyphPosIndex = i + 1 + fr.Glyphs.Start;
+
+                        var lineEndingIndicies = lineEndings.Select((c, i) => new { character = c, index = i })
+                                                .Where(list => list.character == glyphPosIndex)
+                                                .ToList();
+
+                        if (lineEndingIndicies.Count > 0)
+                        {
                             fr.Glyphs[i] = 16;
-                        //else
-                        //    fr.Glyphs[i] = 0;
+
+                            foreach (var lei in lineEndingIndicies)
+                            {
+                                foreach (var foru in _lines[lei.index].Runs)
+                                {
+                                    var ta = ResolveTextAlignment();
+                                    switch (ta)
+                                    {
+                                        // move line to left by width of "-" + LetterSpacing if not left aligned
+                                        case TextAlignment.Center:
+                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing/2;
+                                            break;
+                                        case TextAlignment.Right:
+                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-
             }
         }
 
