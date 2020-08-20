@@ -22,7 +22,7 @@ namespace Topten.RichTextKit
     /// <summary>
     /// Information about a potential line break position
     /// </summary>
-    [DebuggerDisplay("{PositionMeasure}/{PositionWrap} @ {Required} SHY: {IsSoftHyphen}")]
+    [DebuggerDisplay("{PositionMeasure}/{PositionWrap} @ {Required}")]
     internal struct LineBreak
     {
         /// <summary>
@@ -31,13 +31,11 @@ namespace Topten.RichTextKit
         /// <param name="positionMeasure">The code point index to measure to</param>
         /// <param name="positionWrap">The code point index to actually break the line at</param>
         /// <param name="required">True if this is a required line break; otherwise false</param>
-        /// <param name="isSoftHyphen">True if the Linebreak happened because of a Soft-Hyphen</param>
-        public LineBreak(int positionMeasure, int positionWrap, bool required = false, bool isSoftHyphen = false)
+        public LineBreak(int positionMeasure, int positionWrap, bool required = false)
         {
             this.PositionMeasure = positionMeasure;
             this.PositionWrap = positionWrap;
             this.Required = required;
-            this.IsSoftHyphen = isSoftHyphen;
         }
 
 
@@ -61,10 +59,5 @@ namespace Topten.RichTextKit
         /// True if there should be a forced line break here
         /// </summary>
         public bool Required;
-
-        /// <summary>
-        /// Indicates if the linebreak happened because of a soft-hyphen
-        /// </summary>
-        public bool IsSoftHyphen;
     }
 }

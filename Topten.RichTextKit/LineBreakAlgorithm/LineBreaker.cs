@@ -215,10 +215,6 @@ namespace Topten.RichTextKit
 
         public bool NextBreak(out LineBreak lineBreak)
         {
-
-            bool isSoftHyphen = false;
-            bool wasSoftHyphen = false;
-
             // get the first char if we're at the beginning of the string
             if (_first)
             {
@@ -232,25 +228,15 @@ namespace Topten.RichTextKit
 
             while (_pos < _codePoints.Length)
             {
-                wasSoftHyphen = isSoftHyphen;
-                isSoftHyphen = false;
-
-                if (_codePoints[_pos] == 173)
-                {
-                    isSoftHyphen = true;
-
-                }
-
                 _lastPos = _pos;
                 var lastClass = _nextClass;
                 _nextClass = nextCharClass();
-
 
                 // explicit newline
                 if ((_curClass == LineBreakClass.BK) || ((_curClass == LineBreakClass.CR) && (_nextClass != LineBreakClass.LF)))
                 {
                     _curClass = mapFirst(mapClass(_nextClass));
-                    lineBreak = new LineBreak(findPriorNonWhitespace(_lastPos), _lastPos, true, wasSoftHyphen);
+                    lineBreak = new LineBreak(findPriorNonWhitespace(_lastPos), _lastPos, true);
                     return true;
                 }
 
@@ -266,7 +252,7 @@ namespace Topten.RichTextKit
 
                 if (shouldBreak.Value)
                 {
-                    lineBreak = new LineBreak(findPriorNonWhitespace(_lastPos), _lastPos, false, wasSoftHyphen);
+                    lineBreak = new LineBreak(findPriorNonWhitespace(_lastPos), _lastPos, false);
                     return true;
                 }
             }
@@ -275,12 +261,12 @@ namespace Topten.RichTextKit
             {
                 _lastPos = _codePoints.Length;
                 var required = (_curClass == LineBreakClass.BK) || ((_curClass == LineBreakClass.CR) && (_nextClass != LineBreakClass.LF));
-                lineBreak = new LineBreak(findPriorNonWhitespace(_codePoints.Length), _lastPos, required, wasSoftHyphen);
+                lineBreak = new LineBreak(findPriorNonWhitespace(_codePoints.Length), _lastPos, required);
                 return true;
             }
             else
             {
-                lineBreak = new LineBreak(0, 0, false, wasSoftHyphen);
+                lineBreak = new LineBreak(0, 0, false);
                 return false;
             }
         }
