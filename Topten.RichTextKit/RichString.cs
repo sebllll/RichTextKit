@@ -376,6 +376,26 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// The Characters Width that is being used as Hyphen.
+        /// When Hyphenation should take place, the <see cref="SoftHyphenCharacter"/> gets replaced with this one
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default Glyphinfo for a Hyphen)
+        /// </remarks>
+        public float? HyphenCharacterWidth
+        {
+            get => _hyphenCharacterWidth;
+            set
+            {
+                if (value.HasValue && value.Value > 0)
+                {
+                    _hyphenCharacterWidth = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
         /// The maximum number of lines after which lines will be 
         /// truncated and the final line will be appended with an 
         /// ellipsis (`...`) character.
@@ -774,6 +794,7 @@ namespace Topten.RichTextKit
                 previousParagraph = null,
                 softHyphenCharacter = _softHyphenCharacter,
                 hyphenCharacter = _hyphenCharacter,
+                hyphenCharacterWidth = _hyphenCharacterWidth
             };
 
             // Setup style manager
@@ -833,6 +854,7 @@ namespace Topten.RichTextKit
             public int TotalLength;
             public int? softHyphenCharacter;
             public ushort? hyphenCharacter;
+            public float? hyphenCharacterWidth;
         }
 
 
@@ -855,6 +877,7 @@ namespace Topten.RichTextKit
         int? _maxLines;
         int? _softHyphenCharacter;
         ushort? _hyphenCharacter;
+        float? _hyphenCharacterWidth;
         TextAlignment _textAlignment;
         TextDirection _baseDirection;
         IStyle _baseStyle;
@@ -1075,6 +1098,16 @@ namespace Topten.RichTextKit
                 else
                 {
                     TextBlock.HyphenCharacter = 16;
+                }
+
+                // Setup Hyphenation Characters Width
+                if (ctx.hyphenCharacterWidth.HasValue)
+                {
+                    TextBlock.HyphenCharacterWidth = ctx.hyphenCharacterWidth.Value;
+                }
+                else
+                {
+                    TextBlock.HyphenCharacterWidth = 0.5f;
                 }
 
                 // Update the yPosition and stop further processing if truncated

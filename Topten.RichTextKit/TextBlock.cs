@@ -152,6 +152,28 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default glyphInfo for Hyphen)
+        /// </remarks>
+        public float? HyphenCharacterWidth
+        {
+            get => _hyphenCharacterWidth;
+            set
+            {
+                if (value.HasValue && value.Value < 0)
+                    value = 0.5f;
+
+                if (value.HasValue && value != _hyphenCharacterWidth)
+                {
+                    _hyphenCharacterWidth = value.Value;
+                    InvalidateLayout();
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets the left, right or center alignment of the text block.
         /// </summary>
         /// <remarks>
@@ -988,6 +1010,11 @@ namespace Topten.RichTextKit
         /// The Character that represents a SoftHyphen
         /// </summary>
         ushort _hyphenCharacter = 16;
+
+        /// <summary>
+        /// The Characters Width that represents a SoftHyphen
+        /// </summary>
+        float _hyphenCharacterWidth = 0.5f;
 
         /// <summary>
         /// Text alignment
@@ -1855,7 +1882,7 @@ namespace Topten.RichTextKit
                                     {
                                         foreach (var foru in _lines[lei.index].Runs)
                                         {
-                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing / 2;
+                                            foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing / 2;
                                         }
                                     }
                                     break;
@@ -1865,7 +1892,7 @@ namespace Topten.RichTextKit
                                     {
                                         foreach (var foru in _lines[lei.index].Runs)
                                         {
-                                            foru.XCoord -= 0.5f + fr.Style.LetterSpacing;
+                                            foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing;
                                         }
                                     }
                                     break;
