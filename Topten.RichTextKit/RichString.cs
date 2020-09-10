@@ -553,6 +553,27 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// retrieve the measurements for each paragraph in a Richstring
+        /// </summary>
+        /// <param name="doLayout"></param>
+        /// <param name="ParagraphWidths"></param>
+        /// <param name="ParagraphHeights"></param>
+        public void MeasureParagraphs(bool doLayout, out List<float> ParagraphWidths, out List<float> ParagraphHeights)
+        {
+            if (doLayout)
+                Layout();
+
+            ParagraphWidths = new List<float>();
+            ParagraphHeights = new List<float>();
+            foreach (var p in _paragraphs)
+            {
+                ParagraphWidths.Add(p.TextBlock.MeasuredWidth);
+                ParagraphHeights.Add(p.TextBlock.MeasuredHeight + p.MarginTop + p.MarginBottom);
+                
+            }
+        }
+
+        /// <summary>
         /// The number of lines in the text
         /// </summary>
         public int LineCount
