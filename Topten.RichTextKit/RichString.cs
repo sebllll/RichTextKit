@@ -567,9 +567,12 @@ namespace Topten.RichTextKit
             ParagraphHeights = new List<float>();
             foreach (var p in _paragraphs)
             {
-                ParagraphWidths.Add(p.TextBlock.MeasuredWidth);
-                ParagraphHeights.Add(p.TextBlock.MeasuredHeight + p.MarginTop + p.MarginBottom);
-                
+                if (p.TextBlock != null)
+                {
+                    ParagraphWidths.Add(p.TextBlock.MeasuredWidth);
+                    ParagraphHeights.Add(p.TextBlock.MeasuredHeight + p.MarginTop + p.MarginBottom);
+
+                }
             }
         }
 
