@@ -31,7 +31,7 @@ namespace Topten.RichTextKit
         /// <returns>A key string</returns>
         public static string Key(this IStyle This)
         {
-            return $"{This.FontFamily}.{This.FontSize}.{This.FontWeight}.{This.FontItalic}.{This.Underline}.{This.StrikeThrough}.{This.LineHeight}.{This.TextColor}.{This.LetterSpacing}.{This.FontVariant}.{This.TextDirection}";        
+            return $"{This.FontFamily}.{This.FontSize}.{This.FontWeight}.{This.FontItalic}.{This.Underline}.{This.StrikeThrough}.{This.LineHeight}.{This.TextColor}.{This.BackgroundColor}.{This.LetterSpacing}.{This.FontVariant}.{This.TextDirection}.{This.ReplacementCharacter}";
         }
 
         /// <summary>
@@ -59,6 +59,8 @@ namespace Topten.RichTextKit
                 return false;
             if (This.FontVariant != other.FontVariant)
                 return false;
+            if (This.ReplacementCharacter != other.ReplacementCharacter)
+                return false;
             return true;
         }
 
@@ -78,6 +80,8 @@ namespace Topten.RichTextKit
             if (!This.HasSameLayout(other))
                 return false;
             if (This.TextColor != other.TextColor)
+                return false;
+            if (This.BackgroundColor != other.BackgroundColor)
                 return false;
             if (This.Underline != other.Underline)
                 return false;

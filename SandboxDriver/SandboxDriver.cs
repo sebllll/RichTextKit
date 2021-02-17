@@ -11,8 +11,8 @@ namespace SandboxDriver
             FontMapper.Default = new SandboxFontMapper();
         }
 
-        public int ContentModeCount = 13;
-        public int ContentMode = 0;
+        public int ContentModeCount = 14;
+        public int ContentMode = 13;
         public TextDirection BaseDirection = TextDirection.LTR;
         public TextAlignment TextAlignment = TextAlignment.Auto;
         public float Scale = 1.0f;
@@ -53,6 +53,7 @@ namespace SandboxDriver
             //string typefaceName = "Segoe Script";
 
             var styleNormal = new Style() { FontFamily = typefaceName, FontSize = 18 * Scale };
+            var stylePassword = styleNormal.Modify(replacementCharacter: '*');
             var styleSmall = styleNormal.Modify(fontSize: 12 * Scale);
             var styleScript = styleNormal.Modify(fontFamily: "Segoe Script");
             var styleHeading = styleNormal.Modify(fontSize: 24 * Scale, fontWeight: 700);
@@ -104,15 +105,12 @@ namespace SandboxDriver
                     _textBlock.AddText(" and ", styleNormal);
                     _textBlock.AddText("fonts", styleScript);
                     _textBlock.AddText(".\n\n", styleNormal);
-                    _textBlock.AddText("Font fallback means emojis work: 🌐 🍪 🍕 🚀 and ", styleNormal);
+                    _textBlock.AddText("Font fallback means emojis work: 🙍‍♀️ 🌐 🍪 🍕 🚀 and ", styleNormal);
                     _textBlock.AddText("text shaping and bi-directional text support means complex scripts and languages like Arabic: مرحبا بالعالم, Japanese: ハローワールド, Chinese: 世界您好 and Hindi: हैलो वर्ल्ड are rendered correctly!\n\n", styleNormal);
                     _textBlock.AddText("RichTextKit also supports left/center/right text alignment, word wrapping, truncation with ellipsis place-holder, text measurement, hit testing, painting a selection range, caret position & shape helpers.", styleNormal);
                     break;
 
                 case 1:
-                    _textBlock.AddText("\n\n", styleNormal);
-                    //_textBlock.AddEllipsis();
-                    /*
                     _textBlock.AddText("Hello Wor", styleNormal);
                     _textBlock.AddText("ld", styleRed);
                     _textBlock.AddText(". This is normal 18px. These are emojis: 🌐 🍪 🍕 🚀 🏴‍☠️", styleNormal);
@@ -129,7 +127,6 @@ namespace SandboxDriver
                     _textBlock.AddText("हालाँकि प्रचलित रूप पूज", styleNormal);
                     _textBlock.AddText(", Han: ", styleNormal);
                     _textBlock.AddText("緳 踥踕", styleNormal);
-                    */
                     break;
 
                 case 2:
@@ -222,7 +219,11 @@ namespace SandboxDriver
                     _textBlock.AddText("   🌐 🍪 🍕 🚀 🏴‍☠️ xxx\n", styleFixedPitch);
                     _textBlock.AddText("   🌐 🍪 🍕 🚀    xxx\n", styleFixedPitch);
                     _textBlock.AddText("   🌐🍪🍕🚀       xxx\n", styleFixedPitch);
+                    break;
 
+                case 13:
+                    //_textBlock.AddText("Password \nAnother \n", stylePassword);
+                    _textBlock.AddText("Hello World\u2029", styleNormal);
                     break;
             }
 
@@ -243,11 +244,13 @@ namespace SandboxDriver
                 htr = _textBlock.HitTest(_hitTestX - margin, _hitTestY - margin);
                 if (htr.Value.OverCodePointIndex >= 0)
                 {
-                    options.SelectionStart = htr.Value.OverCodePointIndex;
-                    options.SelectionEnd = _textBlock.CaretIndicies[_textBlock.LookupCaretIndex(htr.Value.OverCodePointIndex) + 1];
+                    options.Selection = new TextRange(
+                        htr.Value.OverCodePointIndex,
+                        _textBlock.CaretIndicies[_textBlock.LookupCaretIndex(htr.Value.OverCodePointIndex) + 1]
+                        );
                 }
 
-                ci = _textBlock.GetCaretInfo(htr.Value.ClosestCodePointIndex);
+                ci = _textBlock.GetCaretInfo(new CaretPosition(htr.Value.ClosestCodePointIndex));
             }
 
             if (ShowMeasuredSize)
@@ -315,7 +318,10 @@ namespace SandboxDriver
                 IsAntialias = true,
             });
 
-            state = $"Selection: {options.SelectionStart}-{options.SelectionEnd} Closest: {(htr.HasValue ? htr.Value.ClosestCodePointIndex.ToString() : "-")}";
+            if (options.Selection.HasValue)
+                state = $"Selection: {options.Selection.Value.Start}-{options.Selection.Value.End} Closest: {(htr.HasValue ? htr.Value.ClosestCodePointIndex.ToString() : "-")}";
+            else
+                state = $"Selection: none";
             canvas.DrawText(state, margin, 40, new SKPaint()
             {
                 Typeface = SKTypeface.FromFamilyName("Arial"),

@@ -23,7 +23,6 @@ namespace RichStringSandbox
                         .Alignment(TextAlignment.Left)
                         .Add("Para2a\nParam2b")
                         ;
-            */
             var rs = new RichString()
                 .Alignment(TextAlignment.Center)
                 .FontFamily("Segoe UI")
@@ -32,6 +31,12 @@ namespace RichStringSandbox
                 .Paragraph().Alignment(TextAlignment.Left)
                 .FontSize(18)
                 .Add("This is a test string");
+            */
+
+            var rs = new RichString()
+                .Add("Big text", fontSize: 40, letterSpacing: 0, backgroundColor: new SKColor(0xFFFF0000))
+                .Add("Little text", fontSize: 12, letterSpacing: 0);
+
 
             _richString = rs;
         }
@@ -124,15 +129,14 @@ namespace RichStringSandbox
 
             if (_htr.OverCodePointIndex >= 0)
             {
-                options.SelectionStart = _htr.OverCodePointIndex;
-                options.SelectionEnd = options.SelectionStart + 1;// _textBlock.CaretIndicies[_textBlock.LookupCaretIndex(htr.Value.OverCodePointIndex) + 1];
+                options.Selection = new TextRange(_htr.OverCodePointIndex, _htr.OverCodePointIndex + 1);
             }
 
             _richString.Paint(canvas, new SKPoint(margin, margin), options);
 
             if (_htr.ClosestCodePointIndex >= 0)
             {
-                var ci = _richString.GetCaretInfo(_htr.ClosestCodePointIndex);
+                var ci = _richString.GetCaretInfo(new CaretPosition(_htr.ClosestCodePointIndex, false));
                 using (var paint = new SKPaint()
                 {
                     Color = new SKColor(0xFF000000),

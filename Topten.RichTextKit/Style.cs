@@ -112,6 +112,19 @@ namespace Topten.RichTextKit
             get => _textColor;
             set { CheckNotSealed(); _textColor = value; }
         }
+        
+        /// <summary>
+        /// The background color of this run (no background is painted by default).
+        /// </summary>
+        public SKColor BackgroundColor
+        {
+            get => _backgroundColor;
+            set
+            {
+                CheckNotSealed();
+                _backgroundColor = value;
+            }
+        }
 
         /// <summary>
         /// The character spacing for text in this run (defaults to 0).
@@ -140,6 +153,13 @@ namespace Topten.RichTextKit
             set { CheckNotSealed(); _textDirection = value; }
         }
 
+        /// <inheritdoc />
+        public char ReplacementCharacter
+        {
+            get => _replacementCharacter;
+            set { CheckNotSealed(); _replacementCharacter = value; }
+        }
+
 
         bool _sealed;
         string _fontFamily = "Arial";
@@ -150,9 +170,11 @@ namespace Topten.RichTextKit
         StrikeThroughStyle _strikeThrough;
         float _lineHeight = 1.0f;
         SKColor _textColor = new SKColor(0xFF000000);
+        SKColor _backgroundColor = SKColor.Empty;
         float _letterSpacing;
         FontVariant _fontVariant;
         TextDirection _textDirection = TextDirection.Auto;
+        char _replacementCharacter = '\0';
 
         /// <summary>
         /// Modifies this style with one or more attribute changes and returns a new style
@@ -170,9 +192,11 @@ namespace Topten.RichTextKit
         /// <param name="strikeThrough">The new strike-through style</param>
         /// <param name="lineHeight">The new line height</param>
         /// <param name="textColor">The new text color</param>
+        /// <param name="backgroundColor">The new background color</param>
         /// <param name="letterSpacing">The new letterSpacing</param>
         /// <param name="fontVariant">The new font variant</param>
         /// <param name="textDirection">The new text direction</param>
+        /// <param name="replacementCharacter">The new replacement character</param>
         /// <returns>A new style with the passed attributes changed</returns>
         public Style Modify(
                string fontFamily = null,
@@ -183,9 +207,11 @@ namespace Topten.RichTextKit
                StrikeThroughStyle? strikeThrough = null,
                float? lineHeight = null,
                SKColor? textColor = null,
+               SKColor? backgroundColor = null,
                float? letterSpacing = null,
                FontVariant? fontVariant = null,
-               TextDirection? textDirection = null
+               TextDirection? textDirection = null,
+               char? replacementCharacter = null
             )
         {
             // Resolve new style against current style
@@ -199,9 +225,11 @@ namespace Topten.RichTextKit
                 StrikeThrough = strikeThrough ?? this.StrikeThrough,
                 LineHeight = lineHeight ?? this.LineHeight,
                 TextColor = textColor ?? this.TextColor,
+                BackgroundColor = backgroundColor ?? this.BackgroundColor,
                 LetterSpacing = letterSpacing ?? this.LetterSpacing,
                 FontVariant = fontVariant ?? this.FontVariant,
                 TextDirection = textDirection ?? this.TextDirection,
+                ReplacementCharacter = replacementCharacter ?? this.ReplacementCharacter,
             };
         }
     }

@@ -19,15 +19,15 @@ import: "../.common.page"
 
 
 
-<p>The default style manager instance</p>
+<p>A per-thread style manager</p>
 
 
-<pre class="language-csharp"><code class="language-csharp">public static StyleManager Default;</code></pre>
+<pre class="language-csharp"><code class="language-csharp">public static System.Threading.ThreadLocal&lt;StyleManager&gt; Default;</code></pre>
 
 
 <h2 id="field-type">Field Type</h2>    <table class="name-description">
         <tr>
-            <td><a href="./../ref/Topten.RichTextKit.StyleManager">StyleManager</a></td>
+            <td><a href="https://docs.microsoft.com/dotnet/api/System.Threading.ThreadLocal-1">System.Threading.ThreadLocal&lt;StyleManager&gt;</a></td>
             <td></td>
         </tr>
     </table>

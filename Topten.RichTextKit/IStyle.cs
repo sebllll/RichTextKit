@@ -67,6 +67,11 @@ namespace Topten.RichTextKit
         /// The text color for text in this run.
         /// </summary>
         SKColor TextColor { get; }
+        
+        /// <summary>
+        /// The background color of this run.
+        /// </summary>
+        SKColor BackgroundColor { get; }
 
         /// <summary>
         /// Extra spacing between each character
@@ -82,5 +87,10 @@ namespace Topten.RichTextKit
         /// Text direction override for this span
         /// </summary>
         TextDirection TextDirection { get; }
+
+        /// <summary>
+        /// Specifies a replacement character to be displayed (password mode)
+        /// </summary>
+        char ReplacementCharacter { get; }
     }
 }

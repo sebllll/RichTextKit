@@ -1,4 +1,5 @@
-﻿// RichTextKit
+﻿
+// RichTextKit
 // Copyright © 2019-2020 Topten Software. All Rights Reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may 
@@ -16,9 +17,8 @@
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Topten.RichTextKit.Utils;
 
 namespace Topten.RichTextKit
@@ -26,7 +26,7 @@ namespace Topten.RichTextKit
     /// <summary>
     /// Represents a block of formatted, laid out and measurable text
     /// </summary>
-    public class TextBlock
+    public class TextBlock : StyledText
     {
         /// <summary>
         /// Constructor
@@ -218,111 +218,48 @@ namespace Topten.RichTextKit
         /// <summary>
         /// Clear the content of this text block
         /// </summary>
-        public void Clear()
+        public override void Clear()
         {
             // Reset everything
-            _codePoints.Clear();
-            StyleRun.Pool.Value.ReturnAndClear(_styleRuns);
             FontRun.Pool.Value.ReturnAndClear(_fontRuns);
             TextLine.Pool.Value.ReturnAndClear(_lines);
             _textShapingBuffers.Clear();
+            base.Clear();
+        }
+
+        /// <summary>
+        /// Split this text block at the specified code point index
+        /// </summary>
+        /// <param name="from">The code point index to copy from</param>
+        /// <param name="length">The number of code points to copy</param>
+        /// <returns>A new text block with the RHS split part of the text</returns>
+        public TextBlock Copy(int from, int length)
+        {
+            // Create a new text block with the same attributes as this one
+            var other = new TextBlock();
+            other.Alignment = this.Alignment;
+            other.BaseDirection = this.BaseDirection;
+            other.MaxWidth = this.MaxWidth;
+            other.MaxHeight = this.MaxHeight;
+            other.MaxLines = this.MaxLines;
+
+            // Copy text to the new paragraph
+            foreach (var subRun in _styleRuns.GetInterectingRuns(from, length))
+            {
+                var sr = _styleRuns[subRun.Index];
+                other.AddText(sr.CodePoints.SubSlice(subRun.Offset, subRun.Length), sr.Style);
+            }
+
+            return other;
+        }
+
+        /// <inheritdoc />
+        protected override void OnChanged()
+        {
             InvalidateLayout();
-            _hasTextDirectionOverrides = false;
+            base.OnChanged();
         }
 
-
-        /// <summary>
-        /// Converts a code point index to a character index
-        /// </summary>
-        /// <remarks>
-        /// This method only works when the text buffer was built using the 
-        /// AddText(string) method
-        /// </remarks>
-        /// <param name="codePointIndex">The code point index to convert</param>
-        /// <returns>The converted index</returns>
-        public int CodePointToCharacterIndex(int codePointIndex)
-        {
-            return _codePoints.Utf32OffsetToUtf16Offset(codePointIndex);
-        }
-
-        /// <summary>
-        /// Converts a character index to a code point index
-        /// </summary>
-        /// <remarks>
-        /// This method only works when the text buffer was built using the 
-        /// AddText(string) method
-        /// </remarks>
-        /// <param name="characterIndex">The character index to convert</param>
-        /// <returns>The converted index</returns>
-        public int CharacterToCodePointIndex(int characterIndex)
-        {
-            return _codePoints.Utf16OffsetToUtf32Offset(characterIndex);
-        }
-
-        /// <summary>
-        /// Add text to this paragraph
-        /// </summary>
-        /// <remarks>
-        /// The added text will be internally coverted to UTF32.  
-        /// 
-        /// Note that all text indicies returned by and accepted by this object will 
-        /// be UTF32 "code point indicies".  To convert between UTF16 character indicies 
-        /// and UTF32 code point indicies use the <see cref="CodePointToCharacterIndex(int)"/> 
-        /// and <see cref="CharacterToCodePointIndex(int)"/> methods
-        /// </remarks>
-        /// <param name="text">The text to add</param>
-        /// <param name="style">The style of the text</param>
-        public StyleRun AddText(string text, IStyle style)
-        {
-            // Quit if redundant
-            if (string.IsNullOrEmpty(text))
-                return null;
-
-            // Add to  buffer
-            var utf32 = _codePoints.Add(text);
-
-            // Create a run
-            var run = StyleRun.Pool.Value.Get();
-            run.TextBlock = this;
-            run.CodePointBuffer = _codePoints;
-            run.Start = utf32.Start;
-            run.Length = utf32.Length;
-            run.Style = style;
-            _hasTextDirectionOverrides |= style.TextDirection != TextDirection.Auto;
-
-            // Add run
-            _styleRuns.Add(run);
-
-            return run;
-        }
-
-        /// <summary>
-        /// Add text to this paragraph
-        /// </summary>
-        /// <param name="text">The text to add</param>
-        /// <param name="style">The style of the text</param>
-        public StyleRun AddText(Slice<int> text, IStyle style)
-        {
-            if (text.Length == 0)
-                return null;
-
-            // Add to UTF-32 buffer
-            var utf32 = _codePoints.Add(text);
-
-            // Create a run
-            var run = StyleRun.Pool.Value.Get();
-            run.TextBlock = this;
-            run.CodePointBuffer = _codePoints;
-            run.Start = utf32.Start;
-            run.Length = utf32.Length;
-            run.Style = style;
-            _hasTextDirectionOverrides |= style.TextDirection != TextDirection.Auto;
-
-            // Add run
-            _styleRuns.Add(run);
-
-            return run;
-        }
 
         /// <summary>
         /// Appends an ellipsis to this text block
@@ -405,9 +342,12 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
-        /// Lays out the provided text and returns paragraph
+        /// Updates the internal layout of the text block
         /// </summary>
-        /// <returns>A paragraph that can be drawn</returns>
+        /// <remarks>
+        /// Generally you don't need to call this method as the layout
+        /// will be automatically updated as needed.
+        /// </remarks>
         public void Layout()
         {
             // Needed?
@@ -424,6 +364,7 @@ namespace Topten.RichTextKit
             _fontRuns.Clear();
             _lines.Clear();
             _caretIndicies.Clear();
+            _wordBoundaryIndicies.Clear();
             _measuredHeight = 0;
             _measuredWidth = 0;
             _leftOverhang = null;
@@ -443,17 +384,6 @@ namespace Topten.RichTextKit
 
                 // Finalize lines
                 FinalizeLines();
-            }
-        }
-
-        /// <summary>
-        /// Get the text runs as added by AddText
-        /// </summary>
-        public IReadOnlyList<StyleRun> StyleRuns
-        {
-            get
-            {
-                return _styleRuns;
             }
         }
 
@@ -503,15 +433,15 @@ namespace Topten.RichTextKit
             };
 
             // Prepare selection
-            if (options.SelectionStart.HasValue && options.SelectionEnd.HasValue)
+            if (options.Selection.HasValue)
             {
-                ctx.SelectionStart = Math.Min(options.SelectionStart.Value, options.SelectionEnd.Value);
-                ctx.SelectionEnd = Math.Max(options.SelectionStart.Value, options.SelectionEnd.Value);
+                ctx.SelectionStart = options.Selection.Value.Minimum;
+                ctx.SelectionEnd = options.Selection.Value.Maximum;
                 ctx.PaintSelectionBackground = new SKPaint()
                 {
                     Color = options.SelectionColor,
                     IsStroke = false,
-                    IsAntialias = options.IsAntialias,
+                    IsAntialias = false,
                 };
             }
             else
@@ -560,11 +490,6 @@ namespace Topten.RichTextKit
                 return _measuredHeight;
             }
         }
-
-        /// <summary>
-        /// The length of the added text in code points
-        /// </summary>
-        public int Length => _codePoints.Length;
 
         /// <summary>
         /// The length of the displayed text (in code points)
@@ -712,6 +637,17 @@ namespace Topten.RichTextKit
         /// <summary>
         /// Hit test this block of text
         /// </summary>
+        /// <param name="lineIndex">The line to be hit test</param>
+        /// <param name="x">The x-coordinate relative to top left of the block</param>
+        /// <returns>A HitTestResult</returns>
+        public HitTestResult HitTestLine(int lineIndex, float x)
+        {
+            return _lines[lineIndex].HitTest(x);
+        }
+
+        /// <summary>
+        /// Hit test this block of text
+        /// </summary>
         /// <param name="x">The x-coordinate relative to top left of the block</param>
         /// <param name="y">The x-coordinate relative to top left of the block</param>
         /// <returns>A HitTestResult</returns>
@@ -771,7 +707,9 @@ namespace Topten.RichTextKit
         }
 
 
-        // Build map of all caret positions
+        /// <summary>
+        /// Build map of all caret positions 
+        /// </summary>
         void BuildCaretIndicies()
         {
             Layout();
@@ -802,6 +740,35 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// Retrieves a list of all valid caret positions
+        /// </summary>
+        public IReadOnlyList<int> WordBoundaryIndicies
+        {
+            get
+            {
+                // Find word boundaries (if not already done)
+                if (_wordBoundaryIndicies.Count == 0)
+                {
+                    _wordBoundaryIndicies = WordBoundaryAlgorithm.FindWordBoundaries(_codePoints.AsSlice()).ToList();
+                }
+                return _wordBoundaryIndicies;
+            }
+        }
+
+
+        /// <summary>
+        /// Retrieves a list of the indicies of the first code point in each line
+        /// </summary>
+        public IReadOnlyList<int> LineIndicies
+        {
+            get
+            {
+                return _lines.Select(x => x.Start).ToList();
+            }
+        }
+
+
+        /// <summary>
         /// Given a code point index, find the index in the CaretIndicies
         /// </summary>
         /// <param name="codePointIndex">The code point index to lookup</param>
@@ -818,42 +785,51 @@ namespace Topten.RichTextKit
         /// <summary>
         /// Calculates useful information for displaying a caret
         /// </summary>
-        /// <param name="codePointIndex">The code point index of the caret</param>
+        /// <remarks>
+        /// When altPosition is true, if the code point index indicates the first
+        /// code point after a line break, the returned caret position will be the
+        /// end of the previous line (instead of the start of the next line)
+        /// </remarks>
+        /// <param name="position">The caret position</param>
         /// <returns>A CaretInfo struct</returns>
-        public CaretInfo GetCaretInfo(int codePointIndex)
+        public CaretInfo GetCaretInfo(CaretPosition position)
         {
             // Empty text block?
-            if (_codePoints.Length == 0 || codePointIndex < 0 || _lines.Count == 0)
+            if (_codePoints.Length == 0 || position.CodePointIndex < 0 || _lines.Count == 0)
             {
                 return CaretInfo.None;
             }
 
             // Past the measured length?
-            if (codePointIndex > MeasuredLength)
+            if (position.CodePointIndex > MeasuredLength)
             {
                 return CaretInfo.None;
             }
 
             // Look up the caret index
-            int cpii = LookupCaretIndex(codePointIndex);
+            int cpii = LookupCaretIndex(position.CodePointIndex);
 
             // Create caret info
             var ci = new CaretInfo();
             ci.CodePointIndex = _caretIndicies[cpii];
 
-            var frIndex = FindFontRunForCodePointIndex(codePointIndex);
+            var frIndex = FindFontRunForCodePointIndex(position.CodePointIndex);
             FontRun fr = null;
             if (frIndex >= 0)
             {
                 fr = _fontRuns[frIndex];
 
-                if (fr.Start == codePointIndex && frIndex > 0)
+                if (fr.Start == position.CodePointIndex && frIndex > 0)
                 {
                     var frPrior = _fontRuns[frIndex - 1];
-                    if (frPrior.Direction == TextDirection.RTL && frPrior.End == codePointIndex)
+                    if (frPrior.End == position.CodePointIndex)
                     {
-                        if (frPrior.RunKind != FontRunKind.TrailingWhitespace)
+                        if (position.AltPosition ||
+                            (frPrior.Direction == TextDirection.RTL &&
+                             frPrior.RunKind != FontRunKind.TrailingWhitespace))
+                        {
                             fr = frPrior;
+                        }
                     }
                 }
             }
@@ -870,6 +846,7 @@ namespace Topten.RichTextKit
             // Setup caret coordinates
             ci.CaretXCoord = ci.CodePointIndex < 0 ? 0 : fr.GetXCoordOfCodePointIndex(ci.CodePointIndex);
             ci.CaretRectangle = CalculateCaretRectangle(ci, fr);
+            ci.LineIndex = _lines.IndexOf(fr.Line);
 
             return ci;
         }
@@ -963,6 +940,10 @@ namespace Topten.RichTextKit
         /// </summary>
         void InvalidateLayout()
         {
+            // Make sure style runs are valid (debug only)
+            _styleRuns.CheckValid(_codePoints.Length);
+
+            // Set layout flag
             _needsLayout = true;
         }
 
@@ -1032,16 +1013,6 @@ namespace Topten.RichTextKit
         TextDirection _resolvedBaseDirection;
 
         /// <summary>
-        /// All code points as supplied by user, accumulated into a single buffer
-        /// </summary>
-        Utf32Buffer _codePoints = new Utf32Buffer();
-
-        /// <summary>
-        /// Set to true if any style runs have a directionality override.
-        /// </summary>
-        bool _hasTextDirectionOverrides = false;
-
-        /// <summary>
         /// Re-usable buffers for text shaping results
         /// </summary>
         TextShaper.ResultBufferSet _textShapingBuffers = new TextShaper.ResultBufferSet();
@@ -1050,11 +1021,6 @@ namespace Topten.RichTextKit
         /// Reusable buffer for bidi data
         /// </summary>
         BidiData _bidiData = new BidiData();
-
-        /// <summary>
-        /// A list of style runs, as supplied by user
-        /// </summary>
-        List<StyleRun> _styleRuns = new List<StyleRun>();
 
         /// <summary>
         /// A list of font runs, after splitting by directionality, user styles and font fallback
@@ -1100,6 +1066,11 @@ namespace Topten.RichTextKit
         /// Calculated valid caret indicies
         /// </summary>
         List<int> _caretIndicies = new List<int>();
+
+        /// <summary>
+        /// Calculated word boundary caret indicies
+        /// </summary>
+        List<int> _wordBoundaryIndicies = new List<int>();
 
         /// <summary>
         /// Resolve the text alignment when set to Auto
@@ -1272,7 +1243,7 @@ namespace Topten.RichTextKit
             var codePointsSlice = _codePoints.SubSlice(start, length);
 
             // Split into font fallback runs
-            foreach (var fontRun in FontFallback.GetFontRuns(codePointsSlice, typeface))
+            foreach (var fontRun in FontFallback.GetFontRuns(codePointsSlice, typeface, style.ReplacementCharacter))
             {
                 // Add this run
                 AddFontRun(styleRun, start + fontRun.Start, fontRun.Length, direction, style, fontRun.Typeface, typeface);
@@ -1371,6 +1342,7 @@ namespace Topten.RichTextKit
             public bool CanShapeWith(UnshapedRun next)
             {
                 return typeface == next.typeface &&
+                       style.FontSize == next.style.FontSize &&
                         asFallbackFor == next.asFallbackFor &&
                         direction == next.direction &&
                         start + length == next.start;
@@ -1392,7 +1364,11 @@ namespace Topten.RichTextKit
         {
             // Shape the text
             var shaper = TextShaper.ForTypeface(typeface);
-            var shaped = shaper.Shape(_textShapingBuffers, codePoints, style, direction, codePoints.Start, asFallbackFor, ResolveTextAlignment());
+            TextShaper.Result shaped;
+            if (style.ReplacementCharacter == '\0')
+                shaped = shaper.Shape(_textShapingBuffers, codePoints, style, direction, codePoints.Start, asFallbackFor, ResolveTextAlignment());
+            else
+                shaped = shaper.ShapeReplacement(_textShapingBuffers, codePoints, style, codePoints.Start);
 
             // Create the run
             var fontRun = FontRun.Pool.Value.Get();
@@ -1420,7 +1396,7 @@ namespace Topten.RichTextKit
         {
             // Work out possible line break positions
             _lineBreaker.Reset(_codePoints.AsSlice());
-            var lineBreakPositions = _lineBreaker.GetBreaks();
+            var lineBreakPositions = _lineBreaker.GetBreaks(!_maxWidth.HasValue);
 
             int frIndexStartOfLine = 0;     // Index of the first font run in the current line
             int frIndex = 0;                // Index of the current font run
@@ -1863,7 +1839,7 @@ namespace Topten.RichTextKit
                     {
                         var glyphPosIndex = i + 1 + fr.Glyphs.Start;
 
-                        var lineEndingIndicies = lineEndings.Select((c, i) => new { character = c, index = i })
+                        var lineEndingIndicies = lineEndings.Select((c, j) => new { character = c, index = j })
                                                 .Where(list => list.character == glyphPosIndex)
                                                 .ToList();
 
@@ -2191,6 +2167,8 @@ namespace Topten.RichTextKit
             StyleRun.Pool.Value = new ObjectPool<StyleRun>();
             Bidi.Instance.Value = new Bidi();
         }
+
+
 
     }
 }

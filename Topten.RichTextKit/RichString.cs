@@ -58,6 +58,7 @@ namespace Topten.RichTextKit
         /// <param name="strikeThrough">The new strike-through style</param>
         /// <param name="lineHeight">The new line height</param>
         /// <param name="textColor">The new text color</param>
+        /// <param name="backgroundColor">The new background color</param>
         /// <param name="letterSpacing">The new character spacing</param>
         /// <param name="fontVariant">The new font variant</param>
         /// <param name="textDirection">The new text direction</param>
@@ -71,6 +72,7 @@ namespace Topten.RichTextKit
            StrikeThroughStyle? strikeThrough = null,
            float? lineHeight = null,
            SKColor? textColor = null,
+           SKColor? backgroundColor = null,
            float? letterSpacing = null,
            FontVariant? fontVariant = null,
            TextDirection? textDirection = null
@@ -88,6 +90,7 @@ namespace Topten.RichTextKit
             if (strikeThrough.HasValue) StrikeThrough(strikeThrough.Value);
             if (lineHeight.HasValue) LineHeight(lineHeight.Value);
             if (textColor.HasValue) TextColor(textColor.Value);
+            if (backgroundColor.HasValue) BackgroundColor(backgroundColor.Value);
             if (fontVariant.HasValue) FontVariant(fontVariant.Value);
             if (letterSpacing.HasValue) LetterSpacing(letterSpacing.Value);
             if (textDirection.HasValue) TextDirection(textDirection.Value);
@@ -157,9 +160,16 @@ namespace Topten.RichTextKit
         /// <summary>
         /// Changes the text color
         /// </summary>
-        /// <param name="value">The new font weight</param>
+        /// <param name="value">The new text color</param>
         /// <returns>A reference to the same RichString instance</returns>
         public RichString TextColor(SKColor value) => Append(new TextColorItem(value));
+
+        /// <summary>
+        /// Changes the background color
+        /// </summary>
+        /// <param name="value">The new background color</param>
+        /// <returns>A reference to the same RichString instance</returns>
+        public RichString BackgroundColor(SKColor value) => Append(new BackgroundColorItem(value));
 
         /// <summary>
         /// Changes the character spacing
@@ -455,8 +465,8 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
-        /// The default base text direction for cases where the rich text
-        /// doesn't explicitly specify a text direction
+        /// The default text style to be used as the current style at the start of the rich string.
+        /// Subsequent formatting operations will be applied over this base style.
         /// </summary>
         public IStyle DefaultStyle
         {
@@ -639,7 +649,7 @@ namespace Topten.RichTextKit
             {
                 if (!_revisionValid)
                 {
-                    _revision++;
+                    _revision = (uint)System.Threading.Interlocked.Increment(ref _nextRevision);
                     _revisionValid = true;
                 }
                 return _revision;
@@ -733,34 +743,30 @@ namespace Topten.RichTextKit
         }
 
 
-        /// <summary>
-        /// Calculates useful information for displaying a caret
-        /// </summary>
-        /// <param name="codePointIndex">The code point index of the caret</param>
-        /// <returns>A CaretInfo struct, or CaretInfo.None</returns>
-        public CaretInfo GetCaretInfo(int codePointIndex)
+        /// <inheritdoc cref="TextBlock.GetCaretInfo(CaretPosition)"/>
+        public CaretInfo GetCaretInfo(CaretPosition position)
         {
             Layout();
 
             // Is it outside the displayed range?
-            if (codePointIndex < 0 || codePointIndex > MeasuredLength)
+            if (position.CodePointIndex < 0 || position.CodePointIndex > MeasuredLength)
                 return CaretInfo.None;
 
             // Find the paragraph containing that code point
             ParagraphInfo p;
-            if (codePointIndex == MeasuredLength)
+            if (position.CodePointIndex == MeasuredLength)
             {
                 // Special case for after the last displayed paragraph
                 p = _paragraphs.LastOrDefault(x => !x.Truncated);
             }
             else
             {
-                p = ParagraphForCodePointIndex(codePointIndex);
+                p = ParagraphForCodePointIndex(position.CodePointIndex);
             }
 
 
             // Get the caret info
-            var ci = p.TextBlock.GetCaretInfo(codePointIndex - p.CodePointOffset);
+            var ci = p.TextBlock.GetCaretInfo(new CaretPosition(position.CodePointIndex - p.CodePointOffset, position.AltPosition));
 
             // Adjust it
             ci.CodePointIndex += p.CodePointOffset;
@@ -814,7 +820,7 @@ namespace Topten.RichTextKit
                 maxLines = _maxLines,
                 textAlignment = _textAlignment,
                 baseDirection = _baseDirection,
-                styleManager = StyleManager.Default,
+                styleManager = StyleManager.Default.Value,
                 previousParagraph = null,
                 softHyphenCharacter = _softHyphenCharacter,
                 hyphenCharacter = _hyphenCharacter,
@@ -892,6 +898,7 @@ namespace Topten.RichTextKit
             return this;
         }
 
+        static int _nextRevision = 0;
         bool _revisionValid = false;
         uint _revision = 0;
         bool _needsLayout = true;
@@ -974,44 +981,14 @@ namespace Topten.RichTextKit
                 if (Truncated)
                     return;
 
-                int? oldSelStart = null;
-                int? oldSelEnd = null;
+                TextRange? oldSel = null;
                 if (ctx.textPaintOptions != null)
                 {
                     // Save old selection ranges
-                    oldSelStart = ctx.textPaintOptions.SelectionStart;
-                    oldSelEnd = ctx.textPaintOptions.SelectionEnd;
-
-                    if (oldSelEnd.HasValue && oldSelEnd.Value < this.CodePointOffset)
+                    oldSel = ctx.textPaintOptions.Selection;
+                    if (ctx.textPaintOptions.Selection.HasValue)
                     {
-                        // Selection is before this paragraph
-                        ctx.textPaintOptions.SelectionStart = null;
-                        ctx.textPaintOptions.SelectionEnd = null;
-                    }
-                    else if (oldSelStart.HasValue && oldSelStart.Value >= this.CodePointOffset + this.TextBlock.MeasuredLength)
-                    {
-                        // Selection is after this paragraph
-                        ctx.textPaintOptions.SelectionStart = null;
-                        ctx.textPaintOptions.SelectionEnd = null;
-                    }
-                    else
-                    {
-                        // Selection intersects with this paragraph
-                        if (oldSelStart.HasValue)
-                        {
-                            if (oldSelStart.Value < this.CodePointOffset)
-                                ctx.textPaintOptions.SelectionStart = 0;
-                            else
-                                ctx.textPaintOptions.SelectionStart = oldSelStart.Value - this.CodePointOffset;
-                        }
-
-                        if (oldSelEnd.HasValue)
-                        {
-                            if (oldSelEnd.Value < this.CodePointOffset + this.TextBlock.MeasuredLength)
-                                ctx.textPaintOptions.SelectionEnd = oldSelEnd.Value - this.CodePointOffset;
-                            else
-                                ctx.textPaintOptions.SelectionEnd = this.TextBlock.MeasuredLength;
-                        }
+                        ctx.textPaintOptions.Selection = ctx.textPaintOptions.Selection.Value.Offset(-this.CodePointOffset);
                     }
                 }
 
@@ -1020,10 +997,9 @@ namespace Topten.RichTextKit
                 TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), ctx.textPaintOptions);
 
                 // Restore selection indicies
-                if (ctx.textPaintOptions != null)
+                if (oldSel.HasValue)
                 {
-                    ctx.textPaintOptions.SelectionStart = oldSelStart;
-                    ctx.textPaintOptions.SelectionEnd = oldSelEnd;
+                    ctx.textPaintOptions.Selection = oldSel;
                 }
             }
 
@@ -1318,6 +1294,21 @@ namespace Topten.RichTextKit
             public override void Build(BuildContext ctx)
             {
                 ctx.StyleManager.TextColor(_value);
+            }
+        }
+
+        class BackgroundColorItem : Item
+        {
+            public BackgroundColorItem(SKColor value)
+            {
+                _value = value;
+            }
+
+            SKColor _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.BackgroundColor(_value);
             }
         }
 
