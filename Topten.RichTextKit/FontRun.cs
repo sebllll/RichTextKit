@@ -561,7 +561,7 @@ namespace Topten.RichTextKit
                 return;
 
             // Text 
-            using (var paint = new SKPaint())
+            var paint = _paint ?? (_paint = new SKPaint());
             {
                 // Work out font variant adjustments
                 float glyphScale = 1;
@@ -694,6 +694,7 @@ namespace Topten.RichTextKit
 
         SKTextBlob _textBlob;
         SKFont _font;
+        SKPaint _paint;
 
         void Reset()
         {
@@ -702,8 +703,12 @@ namespace Topten.RichTextKit
             Style = null;
             Typeface = null;
             Line = null;
+            _textBlob?.Dispose();
             _textBlob = null;
+            _font?.Dispose();
             _font = null;
+            _paint?.Dispose();
+            _paint = null;
         }
 
         internal static ThreadLocal<ObjectPool<FontRun>> Pool = new ThreadLocal<ObjectPool<FontRun>>(() => new ObjectPool<FontRun>()
