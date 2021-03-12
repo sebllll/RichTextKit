@@ -128,7 +128,7 @@ namespace RichStringSandbox
                 options.SelectionEnd = options.SelectionStart + 1;// _textBlock.CaretIndicies[_textBlock.LookupCaretIndex(htr.Value.OverCodePointIndex) + 1];
             }
 
-            _richString.Paint(canvas, new SKPoint(margin, margin), options);
+            _richString.Paint(canvas, 1.0f, options);
 
             if (_htr.ClosestCodePointIndex >= 0)
             {

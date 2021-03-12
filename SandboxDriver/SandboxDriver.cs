@@ -289,7 +289,7 @@ namespace SandboxDriver
                 }
             }
 
-            _textBlock.Paint(canvas, new SKPoint(margin, margin), options);
+            _textBlock.Paint(canvas, 1.0f, options);
 
             if (ci != null)
             {

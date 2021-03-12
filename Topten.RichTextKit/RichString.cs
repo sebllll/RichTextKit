@@ -477,11 +477,13 @@ namespace Topten.RichTextKit
         /// </summary>
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="options">Options controlling the paint operation</param>
+        /// <param name="alpha">transparency</param>
         public void Paint(
             SKCanvas canvas,
+            float alpha,
             TextPaintOptions options = null)
         {
-            Paint(canvas, SKPoint.Empty, options);
+            Paint(canvas, SKPoint.Empty, alpha, options);
         }
 
         /// <summary>
@@ -490,9 +492,11 @@ namespace Topten.RichTextKit
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="position">The top left position within the canvas to draw at</param>
         /// <param name="options">Options controlling the paint operation</param>
+        /// <param name="alpha">transparency</param>
         public void Paint(
         SKCanvas canvas,
         SKPoint position,
+        float alpha,
         TextPaintOptions options = null)
         {
             Layout();
@@ -508,7 +512,7 @@ namespace Topten.RichTextKit
 
             foreach (var p in _paragraphs)
             {
-                p.Paint(ref ctx);
+                p.Paint(ref ctx, alpha);
             }
         }
 
@@ -969,7 +973,7 @@ namespace Topten.RichTextKit
                 }
             }
 
-            public void Paint(ref PaintContext ctx)
+            public void Paint(ref PaintContext ctx, float alpha)
             {
                 if (Truncated)
                     return;
@@ -1017,7 +1021,7 @@ namespace Topten.RichTextKit
 
 
                 // Paint it
-                TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), ctx.textPaintOptions);
+                TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), alpha, ctx.textPaintOptions);
 
                 // Restore selection indicies
                 if (ctx.textPaintOptions != null)

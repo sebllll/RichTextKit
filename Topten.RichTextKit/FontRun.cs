@@ -152,6 +152,11 @@ namespace Topten.RichTextKit
         public TextLine Line { get; internal set; }
 
         /// <summary>
+        /// cached SKPaint
+        /// </summary>
+        private SKPaint _paint;
+
+        /// <summary>
         /// Get the next font run from this one
         /// </summary>
         public FontRun NextRun
@@ -503,7 +508,8 @@ namespace Topten.RichTextKit
         /// Paint this font run
         /// </summary>
         /// <param name="ctx"></param>
-        internal void Paint(PaintTextContext ctx)
+        /// <param name="alpha"> transparency</param>
+        internal void Paint(PaintTextContext ctx, float alpha)
         {
             // Paint selection?
             if (ctx.PaintSelectionBackground != null && RunKind != FontRunKind.Ellipsis)
@@ -537,7 +543,7 @@ namespace Topten.RichTextKit
                 return;
 
             // Text 
-            using (var paint = new SKPaint())
+            var paint = _paint ?? (_paint = new SKPaint());
             {
                 // Work out font variant adjustments
                 float glyphScale = 1;
@@ -553,8 +559,10 @@ namespace Topten.RichTextKit
                     glyphVOffset = Style.FontSize * 0.1f;
                 }
 
+                byte alphaByte = (byte)Math.Max(0, Math.Min(255, (int)Math.Floor(alpha * 256.0)));
+
                 // Setup SKPaint
-                paint.Color = Style.TextColor;
+                paint.Color = Style.TextColor.WithAlpha(alphaByte);
                 paint.TextEncoding = SKTextEncoding.GlyphId;
                 paint.Typeface = Typeface;
                 paint.TextSize = Style.FontSize * glyphScale;
@@ -633,6 +641,8 @@ namespace Topten.RichTextKit
                 r.Style = null;
                 r.Typeface = null;
                 r.Line = null;
+                r._paint?.Dispose();
+                r._paint = null;
             }
         });
     }

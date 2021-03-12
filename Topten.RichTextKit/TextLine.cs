@@ -160,11 +160,11 @@ namespace Topten.RichTextKit
         /// Paint this line
         /// </summary>
         /// <param name="ctx">The paint context</param>
-        internal void Paint(PaintTextContext ctx)
+        internal void Paint(PaintTextContext ctx, float alpha)
         {
             foreach (var r in Runs)
             {
-                r.Paint(ctx);
+                r.Paint(ctx, alpha);
             }
         }
 

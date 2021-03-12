@@ -486,7 +486,8 @@ namespace Topten.RichTextKit
         /// </summary>
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="options">Options controlling the paint operation</param>
-        public void Paint(SKCanvas canvas, TextPaintOptions options = null)
+        /// <param name="alpha"> transparency</param>
+        public void Paint(SKCanvas canvas, float alpha, TextPaintOptions options = null)
         {
             // Ensure have options
             if (options == null)
@@ -523,7 +524,7 @@ namespace Topten.RichTextKit
             // Paint each line
             foreach (var l in _lines)
             {
-                l.Paint(ctx);
+                l.Paint(ctx, alpha);
             }
 
             // Clean up
@@ -536,14 +537,15 @@ namespace Topten.RichTextKit
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="position">The top left position within the canvas to draw at</param>
         /// <param name="options">Options controlling the paint operation</param>
-        public void Paint(SKCanvas canvas, SKPoint position, TextPaintOptions options = null)
+        /// <param name="alpha">transparency</param>
+        public void Paint(SKCanvas canvas, SKPoint position, float alpha, TextPaintOptions options = null)
         {
             // Translate
             canvas.Save();
             canvas.Translate(position.X, position.Y);
 
             // Paint it
-            Paint(canvas, options);
+            Paint(canvas, alpha, options);
 
             // Restore and done!
             canvas.Restore();
