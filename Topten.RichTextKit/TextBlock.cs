@@ -1850,56 +1850,35 @@ namespace Topten.RichTextKit
         /// </summary>
         private void AdjustHyphens()
         {
-            List<int> lineEndings = new List<int>();
-            foreach (var l in _lines)
+            for (int f = 0; f < FontRuns.Count; f++)
             {
-                lineEndings.Add(l.End);
-            }
+                var fr = FontRuns[f];
 
-            foreach (var fr in FontRuns)
-            {
-                for (int i = 0; i < fr.Glyphs.Length; i++)
+                var lastCodepoint = fr.CodePoints[fr.End - fr.Start - 1];
+
+                if (lastCodepoint == _softHyphenCharacter) // 173 is a SoftHyphen
                 {
-                    //if (fr.Glyphs[i] == 3)
-                    if (fr.CodePoints[i] == _softHyphenCharacter) // 173 is a SoftHyphen
+                    // replace the last glyph in the line with a Hyphen
+                    fr.Glyphs[fr.Glyphs.Length - 1] = _hyphenCharacter;
+
+
+                    // shift the XCoords of that line a bit to the left if TextAlignment is Right or Centered
+                    var ta = ResolveTextAlignment();
+                    switch (ta)
                     {
-                        var glyphPosIndex = i + 1 + fr.Glyphs.Start;
-
-                        var lineEndingIndicies = lineEndings.Select((c, i) => new { character = c, index = i })
-                                                .Where(list => list.character == glyphPosIndex)
-                                                .ToList();
-
-                        // when the SoftHyphen was at a lineEnding
-                        if (lineEndingIndicies.Count > 0) 
-                        {
-                            // replace it with a Hyphen
-                            fr.Glyphs[i] = _hyphenCharacter;
-
-                            // shift the XCoords of that line a bit to the left if Right or Centered
-                            var ta = ResolveTextAlignment();
-                            switch (ta)
+                        case TextAlignment.Center:
+                            foreach (var foru in _lines[f].Runs)
                             {
-                                case TextAlignment.Center:
-                                    foreach (var lei in lineEndingIndicies)
-                                    {
-                                        foreach (var foru in _lines[lei.index].Runs)
-                                        {
-                                            foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing / 2;
-                                        }
-                                    }
-                                    break;
-
-                                case TextAlignment.Right:
-                                    foreach (var lei in lineEndingIndicies)
-                                    {
-                                        foreach (var foru in _lines[lei.index].Runs)
-                                        {
-                                            foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing;
-                                        }
-                                    }
-                                    break;
+                                foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing / 2;
                             }
-                        }
+                            break;
+
+                        case TextAlignment.Right:
+                            foreach (var foru in _lines[f].Runs)
+                            {
+                                foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing;
+                            }
+                            break;
                     }
                 }
             }
