@@ -1867,17 +1867,11 @@ namespace Topten.RichTextKit
                     switch (ta)
                     {
                         case TextAlignment.Center:
-                            foreach (var foru in _lines[f].Runs)
-                            {
-                                foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing / 2;
-                            }
+                            fr.XCoord -= (_hyphenCharacterWidth + fr.Style.LetterSpacing) / 2;
                             break;
 
                         case TextAlignment.Right:
-                            foreach (var foru in _lines[f].Runs)
-                            {
-                                foru.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing;
-                            }
+                            fr.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing;
                             break;
                     }
                 }
