@@ -1,5 +1,5 @@
 [submodule "buildtools"]
 	path = buildtools
-	url = https://github.com/toptensoftware/buildtools.git
-	branch = main
+	url = git@github.com:sebllll/toptensoftware.buildtools.git
+	branch = VL-Wrapper
 	
