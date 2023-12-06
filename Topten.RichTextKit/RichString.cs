@@ -53,11 +53,16 @@ namespace Topten.RichTextKit
         /// <param name="fontFamily">The new font family</param>
         /// <param name="fontSize">The new font size</param>
         /// <param name="fontWeight">The new font weight</param>
+        /// <param name="fontWidth">The new font width</param>
         /// <param name="fontItalic">The new font italic</param>
         /// <param name="underline">The new underline style</param>
         /// <param name="strikeThrough">The new strike-through style</param>
         /// <param name="lineHeight">The new line height</param>
         /// <param name="textColor">The new text color</param>
+        /// <param name="backgroundColor">The new background color</param>
+        /// <param name="haloColor">The new halo color</param>
+        /// <param name="haloWidth">The new halo width</param>
+        /// <param name="haloBlur">The new halo blur width</param>
         /// <param name="letterSpacing">The new character spacing</param>
         /// <param name="fontVariant">The new font variant</param>
         /// <param name="textDirection">The new text direction</param>
@@ -66,11 +71,16 @@ namespace Topten.RichTextKit
            string fontFamily = null,
            float? fontSize = null,
            int? fontWeight = null,
+           SKFontStyleWidth? fontWidth = null,
            bool? fontItalic = null,
            UnderlineStyle? underline = null,
            StrikeThroughStyle? strikeThrough = null,
            float? lineHeight = null,
            SKColor? textColor = null,
+           SKColor? backgroundColor = null,
+           SKColor? haloColor = null,
+           float? haloWidth = null,
+           float? haloBlur = null,
            float? letterSpacing = null,
            FontVariant? fontVariant = null,
            TextDirection? textDirection = null
@@ -83,11 +93,16 @@ namespace Topten.RichTextKit
             if (fontFamily != null) FontFamily(fontFamily);
             if (fontSize.HasValue) FontSize(fontSize.Value);
             if (fontWeight.HasValue) FontWeight(fontWeight.Value);
+            if (fontWidth.HasValue) FontWidth(fontWidth.Value);
             if (fontItalic.HasValue) FontItalic(fontItalic.Value);
             if (underline.HasValue) Underline(underline.Value);
             if (strikeThrough.HasValue) StrikeThrough(strikeThrough.Value);
             if (lineHeight.HasValue) LineHeight(lineHeight.Value);
             if (textColor.HasValue) TextColor(textColor.Value);
+            if (backgroundColor.HasValue) BackgroundColor(backgroundColor.Value);
+            if (haloColor.HasValue) HaloColor(haloColor.Value);
+            if (haloWidth.HasValue) HaloWidth(haloWidth.Value);
+            if (haloBlur.HasValue) HaloBlur(haloBlur.Value);
             if (fontVariant.HasValue) FontVariant(fontVariant.Value);
             if (letterSpacing.HasValue) LetterSpacing(letterSpacing.Value);
             if (textDirection.HasValue) TextDirection(textDirection.Value);
@@ -127,6 +142,13 @@ namespace Topten.RichTextKit
         public RichString Bold(bool value = true) => Append(new FontWeightItem(value ? 700 : 400));
 
         /// <summary>
+        /// Changes the font width
+        /// </summary>
+        /// <param name="value">The new font width</param>
+        /// <returns>A reference to the same RichString instance</returns>
+        public RichString FontWidth(SKFontStyleWidth value) => Append(new FontWidthItem(value));
+
+        /// <summary>
         /// Changes the font italic setting 
         /// </summary>
         /// <param name="value">The new font italic setting</param>
@@ -157,9 +179,37 @@ namespace Topten.RichTextKit
         /// <summary>
         /// Changes the text color
         /// </summary>
-        /// <param name="value">The new font weight</param>
+        /// <param name="value">The new text color</param>
         /// <returns>A reference to the same RichString instance</returns>
         public RichString TextColor(SKColor value) => Append(new TextColorItem(value));
+
+        /// <summary>
+        /// Changes the background color
+        /// </summary>
+        /// <param name="value">The new background color</param>
+        /// <returns>A reference to the same RichString instance</returns>
+        public RichString BackgroundColor(SKColor value) => Append(new BackgroundColorItem(value));
+
+        /// <summary>
+        /// Changes the halo color
+        /// </summary>
+        /// <param name="value">The new halo color</param>
+        /// <returns>A reference to the same RichString instance</returns>
+        public RichString HaloColor(SKColor value) => Append(new HaloColorItem(value));
+
+        /// <summary>
+        /// Changes the halo width
+        /// </summary>
+        /// <param name="value">The new halo width</param>
+        /// <returns>A reference to the same RichString instance</returns>
+        public RichString HaloWidth(float value) => Append(new HaloWidthItem(value));
+
+        /// <summary>
+        /// Changes the halo blur width
+        /// </summary>
+        /// <param name="value">The new halo blur width</param>
+        /// <returns>A reference to the same RichString instance</returns>
+        public RichString HaloBlur(float value) => Append(new HaloBlurItem(value));
 
         /// <summary>
         /// Changes the character spacing
@@ -421,6 +471,26 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// Controls the rendering of an ellipsis (`...`) character,
+        /// when the line has been truncated because of MaxWidth/MaxHeight/MaxLines.
+        /// </summary>
+        /// <remarks>
+        /// The default value is true, an ellipsis will be rendered.
+        /// </remarks>
+        public bool EllipsisEnabled
+        {
+            get => _ellipsisEnabled;
+            set
+            {
+                if (value != _ellipsisEnabled)
+                {
+                    _ellipsisEnabled = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets the default text alignment for cases where
         /// the rich text doesn't specify an alignment
         /// </summary>
@@ -455,8 +525,8 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
-        /// The default base text direction for cases where the rich text
-        /// doesn't explicitly specify a text direction
+        /// The default text style to be used as the current style at the start of the rich string.
+        /// Subsequent formatting operations will be applied over this base style.
         /// </summary>
         public IStyle DefaultStyle
         {
@@ -643,7 +713,7 @@ namespace Topten.RichTextKit
             {
                 if (!_revisionValid)
                 {
-                    _revision++;
+                    _revision = (uint)System.Threading.Interlocked.Increment(ref _nextRevision);
                     _revisionValid = true;
                 }
                 return _revision;
@@ -737,34 +807,30 @@ namespace Topten.RichTextKit
         }
 
 
-        /// <summary>
-        /// Calculates useful information for displaying a caret
-        /// </summary>
-        /// <param name="codePointIndex">The code point index of the caret</param>
-        /// <returns>A CaretInfo struct, or CaretInfo.None</returns>
-        public CaretInfo GetCaretInfo(int codePointIndex)
+        /// <inheritdoc cref="TextBlock.GetCaretInfo(CaretPosition)"/>
+        public CaretInfo GetCaretInfo(CaretPosition position)
         {
             Layout();
 
             // Is it outside the displayed range?
-            if (codePointIndex < 0 || codePointIndex > MeasuredLength)
+            if (position.CodePointIndex < 0 || position.CodePointIndex > MeasuredLength)
                 return CaretInfo.None;
 
             // Find the paragraph containing that code point
             ParagraphInfo p;
-            if (codePointIndex == MeasuredLength)
+            if (position.CodePointIndex == MeasuredLength)
             {
                 // Special case for after the last displayed paragraph
                 p = _paragraphs.LastOrDefault(x => !x.Truncated);
             }
             else
             {
-                p = ParagraphForCodePointIndex(codePointIndex);
+                p = ParagraphForCodePointIndex(position.CodePointIndex);
             }
 
 
             // Get the caret info
-            var ci = p.TextBlock.GetCaretInfo(codePointIndex - p.CodePointOffset);
+            var ci = p.TextBlock.GetCaretInfo(new CaretPosition(position.CodePointIndex - p.CodePointOffset, position.AltPosition));
 
             // Adjust it
             ci.CodePointIndex += p.CodePointOffset;
@@ -779,7 +845,7 @@ namespace Topten.RichTextKit
 
         ParagraphInfo ParagraphForCodePointIndex(int index)
         {
-            for (int i=1; i<_paragraphs.Count; i++)
+            for (int i = 1; i < _paragraphs.Count; i++)
             {
                 if (index < _paragraphs[i].CodePointOffset)
                     return _paragraphs[i - 1];
@@ -816,9 +882,10 @@ namespace Topten.RichTextKit
                 maxWidth = _maxWidth,
                 maxHeight = _maxHeight,
                 maxLines = _maxLines,
+                ellipsisEnabled = _ellipsisEnabled,
                 textAlignment = _textAlignment,
                 baseDirection = _baseDirection,
-                styleManager = StyleManager.Default,
+                styleManager = StyleManager.Default.Value,
                 previousParagraph = null,
                 softHyphenCharacter = _softHyphenCharacter,
                 hyphenCharacter = _hyphenCharacter,
@@ -840,8 +907,9 @@ namespace Topten.RichTextKit
                 // If this paragraph wasn't completely truncated, then update the measured width
                 if (!p.Truncated)
                 {
-                    if (p.TextBlock.MeasuredWidth > _measuredWidth)
-                        _measuredWidth = p.TextBlock.MeasuredWidth;
+                    var paraWidth = p.TextBlock.MeasuredWidth + p.MarginLeft + p.MarginRight;
+                    if (paraWidth > _measuredWidth)
+                        _measuredWidth = paraWidth;
                 }
 
                 // Store the this paragraph as the previous so a fully truncated subsequent
@@ -874,6 +942,7 @@ namespace Topten.RichTextKit
             public float? maxWidth;
             public float? maxHeight;
             public int? maxLines;
+            public bool ellipsisEnabled;
             public TextAlignment? textAlignment;
             public TextDirection? baseDirection;
             public StyleManager styleManager;
@@ -896,6 +965,7 @@ namespace Topten.RichTextKit
             return this;
         }
 
+        static int _nextRevision = 0;
         bool _revisionValid = false;
         uint _revision = 0;
         bool _needsLayout = true;
@@ -903,6 +973,7 @@ namespace Topten.RichTextKit
         float? _maxWidth;
         float? _maxHeight;
         int? _maxLines;
+        bool _ellipsisEnabled = true;
         int? _softHyphenCharacter;
         ushort? _hyphenCharacter;
         float? _hyphenCharacterWidth;
@@ -978,44 +1049,14 @@ namespace Topten.RichTextKit
                 if (Truncated)
                     return;
 
-                int? oldSelStart = null;
-                int? oldSelEnd = null;
+                TextRange? oldSel = null;
                 if (ctx.textPaintOptions != null)
                 {
                     // Save old selection ranges
-                    oldSelStart = ctx.textPaintOptions.SelectionStart;
-                    oldSelEnd = ctx.textPaintOptions.SelectionEnd;
-
-                    if (oldSelEnd.HasValue && oldSelEnd.Value < this.CodePointOffset)
+                    oldSel = ctx.textPaintOptions.Selection;
+                    if (ctx.textPaintOptions.Selection.HasValue)
                     {
-                        // Selection is before this paragraph
-                        ctx.textPaintOptions.SelectionStart = null;
-                        ctx.textPaintOptions.SelectionEnd = null;
-                    }
-                    else if (oldSelStart.HasValue && oldSelStart.Value >= this.CodePointOffset + this.TextBlock.MeasuredLength)
-                    {
-                        // Selection is after this paragraph
-                        ctx.textPaintOptions.SelectionStart = null;
-                        ctx.textPaintOptions.SelectionEnd = null;
-                    }
-                    else
-                    {
-                        // Selection intersects with this paragraph
-                        if (oldSelStart.HasValue)
-                        {
-                            if (oldSelStart.Value < this.CodePointOffset)
-                                ctx.textPaintOptions.SelectionStart = 0;
-                            else
-                                ctx.textPaintOptions.SelectionStart = oldSelStart.Value - this.CodePointOffset;
-                        }
-
-                        if (oldSelEnd.HasValue)
-                        {
-                            if (oldSelEnd.Value < this.CodePointOffset + this.TextBlock.MeasuredLength)
-                                ctx.textPaintOptions.SelectionEnd = oldSelEnd.Value - this.CodePointOffset;
-                            else
-                                ctx.textPaintOptions.SelectionEnd = this.TextBlock.MeasuredLength;
-                        }
+                        ctx.textPaintOptions.Selection = ctx.textPaintOptions.Selection.Value.Offset(-this.CodePointOffset);
                     }
                 }
 
@@ -1024,10 +1065,9 @@ namespace Topten.RichTextKit
                 TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), alpha, ctx.textPaintOptions);
 
                 // Restore selection indicies
-                if (ctx.textPaintOptions != null)
+                if (oldSel.HasValue)
                 {
-                    ctx.textPaintOptions.SelectionStart = oldSelStart;
-                    ctx.textPaintOptions.SelectionEnd = oldSelEnd;
+                    ctx.textPaintOptions.Selection = oldSel;
                 }
             }
 
@@ -1054,7 +1094,7 @@ namespace Topten.RichTextKit
                         i.Build(buildContext);
                     }
                 }
-                
+
                 // Store code point offset of this paragraph
                 CodePointOffset = ctx.TotalLength;
                 LineOffset = ctx.lineCount;
@@ -1099,9 +1139,13 @@ namespace Topten.RichTextKit
                     TextBlock.MaxLines = null;
                 }
 
+                // Set ellipsis option
+                TextBlock.EllipsisEnabled = ctx.ellipsisEnabled;
+
                 // Truncated?
                 if (TextBlock.MaxLines == 0 || TextBlock.MaxHeight == 0)
                 {
+                    ctx.previousParagraph?.TextBlock.AddEllipsis();
                     TextBlock = null;
                     Truncated = true;
                     ctx.Truncated = true;
@@ -1250,6 +1294,21 @@ namespace Topten.RichTextKit
             }
         }
 
+        class FontWidthItem : Item
+        {
+            public FontWidthItem(SKFontStyleWidth value)
+            {
+                _value = value;
+            }
+
+            SKFontStyleWidth _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.FontWidth(_value);
+            }
+        }
+
         class FontItalicItem : Item
         {
             public FontItalicItem(bool value)
@@ -1322,6 +1381,66 @@ namespace Topten.RichTextKit
             public override void Build(BuildContext ctx)
             {
                 ctx.StyleManager.TextColor(_value);
+            }
+        }
+
+        class BackgroundColorItem : Item
+        {
+            public BackgroundColorItem(SKColor value)
+            {
+                _value = value;
+            }
+
+            SKColor _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.BackgroundColor(_value);
+            }
+        }
+
+        class HaloColorItem : Item
+        {
+            public HaloColorItem(SKColor value)
+            {
+                _value = value;
+            }
+
+            SKColor _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.HaloColor(_value);
+            }
+        }
+
+        class HaloWidthItem : Item
+        {
+            public HaloWidthItem(float value)
+            {
+                _value = value;
+            }
+
+            float _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.HaloWidth(_value);
+            }
+        }
+
+        class HaloBlurItem : Item
+        {
+            public HaloBlurItem(float value)
+            {
+                _value = value;
+            }
+
+            float _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.HaloBlur(_value);
             }
         }
 

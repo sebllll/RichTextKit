@@ -43,6 +43,11 @@ namespace Topten.RichTextKit
         int FontWeight { get; }
 
         /// <summary>
+        /// The font weight for text in this run.
+        /// </summary>
+        SKFontStyleWidth FontWidth { get; }
+
+        /// <summary>
         /// True if the text in this run should be displayed in an italic
         /// font; otherwise False.
         /// </summary>
@@ -67,6 +72,26 @@ namespace Topten.RichTextKit
         /// The text color for text in this run.
         /// </summary>
         SKColor TextColor { get; }
+        
+        /// <summary>
+        /// The background color of this run.
+        /// </summary>
+        SKColor BackgroundColor { get; }
+
+        /// <summary>
+        /// Color of the halo
+        /// </summary>
+        SKColor HaloColor { get; }
+
+        /// <summary>
+        /// Width of halo
+        /// </summary>
+        float HaloWidth { get; }
+
+        /// <summary>
+        /// Blur of halo
+        /// </summary>
+        float HaloBlur { get; }
 
         /// <summary>
         /// Extra spacing between each character
@@ -82,5 +107,10 @@ namespace Topten.RichTextKit
         /// Text direction override for this span
         /// </summary>
         TextDirection TextDirection { get; }
+
+        /// <summary>
+        /// Specifies a replacement character to be displayed (password mode)
+        /// </summary>
+        char ReplacementCharacter { get; }
     }
 }

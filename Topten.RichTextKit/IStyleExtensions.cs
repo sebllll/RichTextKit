@@ -31,7 +31,7 @@ namespace Topten.RichTextKit
         /// <returns>A key string</returns>
         public static string Key(this IStyle This)
         {
-            return $"{This.FontFamily}.{This.FontSize}.{This.FontWeight}.{This.FontItalic}.{This.Underline}.{This.StrikeThrough}.{This.LineHeight}.{This.TextColor}.{This.LetterSpacing}.{This.FontVariant}.{This.TextDirection}";        
+            return $"{This.FontFamily}.{This.FontSize}.{This.FontWeight}.{This.FontWidth}.{This.FontItalic}.{This.Underline}.{This.StrikeThrough}.{This.LineHeight}.{This.TextColor}.{This.BackgroundColor}.{This.LetterSpacing}.{This.FontVariant}.{This.TextDirection}.{This.ReplacementCharacter}.{This.HaloWidth}.{This.HaloColor}.{This.HaloBlur}";
         }
 
         /// <summary>
@@ -49,6 +49,8 @@ namespace Topten.RichTextKit
                 return false;
             if (This.FontWeight != other.FontWeight)
                 return false;
+            if (This.FontWidth != other.FontWidth)
+                return false;
             if (This.FontItalic != other.FontItalic)
                 return false;
             if (This.LineHeight != other.LineHeight)
@@ -58,6 +60,8 @@ namespace Topten.RichTextKit
             if (This.LetterSpacing != other.LetterSpacing)
                 return false;
             if (This.FontVariant != other.FontVariant)
+                return false;
+            if (This.ReplacementCharacter != other.ReplacementCharacter)
                 return false;
             return true;
         }
@@ -79,14 +83,19 @@ namespace Topten.RichTextKit
                 return false;
             if (This.TextColor != other.TextColor)
                 return false;
+            if (This.BackgroundColor != other.BackgroundColor)
+                return false;
             if (This.Underline != other.Underline)
                 return false;
             if (This.StrikeThrough != other.StrikeThrough)
                 return false;
+            if (This.HaloBlur != other.HaloBlur)
+                return false;
+            if (This.HaloColor != other.HaloColor)
+                return false;
+            if (This.HaloWidth != other.HaloWidth)
+                return false;
             return true;
         }
-
-
-
     }
 }

@@ -59,8 +59,14 @@ doesn't explicitly specify a text direction</p>
             </tr>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.RichString.DefaultStyle">DefaultStyle</a></td>
-                <td><p>The default base text direction for cases where the rich text
-doesn't explicitly specify a text direction</p>
+                <td><p>The default text style to be used as the current style at the start of the rich string.
+Subsequent formatting operations will be applied over this base style.</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.EllipsisEnabled">EllipsisEnabled</a></td>
+                <td><p>Controls the rendering of an ellipsis (<code>...</code>) character,
+when the line has been truncated because of MaxWidth/MaxHeight/MaxLines.</p>
 </td>
             </tr>
             <tr>
@@ -130,13 +136,18 @@ constraints</p>
 </td>
             </tr>
             <tr>
-                <td><a href="./../ref/Topten.RichTextKit.RichString.Add#Topten.RichTextKit-RichString.Add-System-String-System-String-System-Nullable-System-Single--System-Nullable-System-Int32--System-Nullable-System-Boolean--System-Nullable-Topten.RichTextKit-UnderlineStyle--System-Nullable-Topten.RichTextKit-StrikeThroughStyle--System-Nullable-System-Single--System-Nullable-SkiaSharp-SKColor--System-Nullable-System-Single--System-Nullable-Topten.RichTextKit-FontVariant--System-Nullable-Topten.RichTextKit-TextDirection-">Add(string, string, Nullable&lt;float&gt;, Nullable&lt;int&gt;, Nullable&lt;bool&gt;, Nullable&lt;UnderlineStyle&gt;, Nullable&lt;StrikeThroughStyle&gt;, Nullable&lt;float&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;float&gt;, Nullable&lt;FontVariant&gt;, Nullable&lt;TextDirection&gt;)</a></td>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.Add#Topten.RichTextKit-RichString.Add-System-String-System-String-System-Nullable-System-Single--System-Nullable-System-Int32--System-Nullable-SkiaSharp-SKFontStyleWidth--System-Nullable-System-Boolean--System-Nullable-Topten.RichTextKit-UnderlineStyle--System-Nullable-Topten.RichTextKit-StrikeThroughStyle--System-Nullable-System-Single--System-Nullable-SkiaSharp-SKColor--System-Nullable-SkiaSharp-SKColor--System-Nullable-SkiaSharp-SKColor--System-Nullable-System-Single--System-Nullable-System-Single--System-Nullable-System-Single--System-Nullable-Topten.RichTextKit-FontVariant--System-Nullable-Topten.RichTextKit-TextDirection-">Add(string, string, Nullable&lt;float&gt;, Nullable&lt;int&gt;, Nullable&lt;SkiaSharp.SKFontStyleWidth&gt;, Nullable&lt;bool&gt;, Nullable&lt;UnderlineStyle&gt;, Nullable&lt;StrikeThroughStyle&gt;, Nullable&lt;float&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;float&gt;, Nullable&lt;float&gt;, Nullable&lt;float&gt;, Nullable&lt;FontVariant&gt;, Nullable&lt;TextDirection&gt;)</a></td>
                 <td><p>Adds text with various style attributes changed</p>
 </td>
             </tr>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.RichString.Alignment">Alignment(TextAlignment)</a></td>
                 <td><p>Sets the text alignment of the current paragraph</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.BackgroundColor">BackgroundColor(SkiaSharp.SKColor)</a></td>
+                <td><p>Changes the background color</p>
 </td>
             </tr>
             <tr>
@@ -180,8 +191,28 @@ constraints</p>
 </td>
             </tr>
             <tr>
-                <td><a href="./../ref/Topten.RichTextKit.RichString.GetCaretInfo">GetCaretInfo(int)</a></td>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.FontWidth">FontWidth(SkiaSharp.SKFontStyleWidth)</a></td>
+                <td><p>Changes the font width</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.GetCaretInfo">GetCaretInfo(CaretPosition)</a></td>
                 <td><p>Calculates useful information for displaying a caret</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.HaloBlur">HaloBlur(float)</a></td>
+                <td><p>Changes the halo blur width</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.HaloColor">HaloColor(SkiaSharp.SKColor)</a></td>
+                <td><p>Changes the halo color</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.HaloWidth">HaloWidth(float)</a></td>
+                <td><p>Changes the halo width</p>
 </td>
             </tr>
             <tr>
@@ -274,6 +305,14 @@ constraints</p>
 
 
 
+    <h2 id="nested-types">Overridden &amp Inherited</h2>
+    <table class="name-description">
+        <tr>
+                <td><a href="./../ref/Topten.RichTextKit.RichString.ToString">ToString()</a></td>
+                <td><p>Provides the plain-text equivalent of this RichString</p>
+</td>
+        </tr>
+    </table>
 
 
 

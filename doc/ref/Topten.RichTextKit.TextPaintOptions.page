@@ -53,6 +53,16 @@ a selection range.</p>
     <h2 id="properties">Properties</h2>
     <table class="name-description">
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.Edging">Edging</a></td>
+                <td><p>Controls how font edges are drawn</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.Hinting">Hinting</a></td>
+                <td><p>Controls the font hint used when rendering text</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.IsAntialias">IsAntialias</a></td>
                 <td><p>Controls whether text is rendered with anti-aliasing.</p>
 </td>
@@ -63,18 +73,28 @@ a selection range.</p>
 </td>
             </tr>
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.Selection">Selection</a></td>
+                <td><p>An optional TextRange to painted as selected.</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.SelectionColor">SelectionColor</a></td>
-                <td><p>The color to draw selection background with.</p>
+                <td><p>The color to be used for the selection background.</p>
 </td>
             </tr>
             <tr>
-                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.SelectionEnd">SelectionEnd</a></td>
-                <td><p>An optional code point index of the end of a selection range.</p>
+                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.SelectionHandleColor">SelectionHandleColor</a></td>
+                <td><p>The color to be used for touch screen selection handles</p>
 </td>
             </tr>
             <tr>
-                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.SelectionStart">SelectionStart</a></td>
-                <td><p>An optional code point index of the start of a selection range.</p>
+                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.SelectionHandleScale">SelectionHandleScale</a></td>
+                <td><p>Scaling of the touch screen selection handles</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.TextPaintOptions.SubpixelPositioning">SubpixelPositioning</a></td>
+                <td><p>Requests text be drawn at sub-pixel offsets</p>
 </td>
             </tr>
     </table>

@@ -14,9 +14,8 @@
 // under the License.
 
 using SkiaSharp;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 
 namespace Topten.RichTextKit
 {
@@ -35,9 +34,9 @@ namespace Topten.RichTextKit
     public class StyleManager
     {
         /// <summary>
-        /// The default style manager instance
+        /// A per-thread style manager
         /// </summary>
-        public static StyleManager Default = new StyleManager();
+        public static ThreadLocal<StyleManager> Default = new ThreadLocal<StyleManager>(() => new StyleManager());
 
         /// <summary>
         /// Constructs a new StyleManager
@@ -81,9 +80,10 @@ namespace Topten.RichTextKit
             if (IsOwned(value))
                 return value;
 
-            return Update(value.FontFamily, value.FontSize, value.FontWeight, value.FontItalic,
-                            value.Underline, value.StrikeThrough, value.LineHeight, value.TextColor,
-                            value.LetterSpacing, value.FontVariant, value.TextDirection);
+            return Update(value.FontFamily, value.FontSize, value.FontWeight, value.FontWidth, value.FontItalic,
+                            value.Underline, value.StrikeThrough, value.LineHeight, value.TextColor, value.BackgroundColor,
+                            value.HaloColor, value.HaloWidth, value.HaloBlur,
+                            value.LetterSpacing, value.FontVariant, value.TextDirection, value.ReplacementCharacter);
         }
 
         /// <summary>
@@ -133,13 +133,19 @@ namespace Topten.RichTextKit
         /// <returns>An IStyle for the new style</returns>
         public IStyle FontWeight(int fontWeight) => Update(fontWeight: fontWeight);
 
-
         /// <summary>
         /// Changes the font weight and returns an update IStyle (short cut to FontWeight)
         /// </summary>
         /// <param name="bold">The new font weight</param>
         /// <returns>An IStyle for the new style</returns>
         public IStyle Bold(bool bold) => Update(fontWeight: bold ? 700 : 400);
+
+        /// <summary>
+        /// Changes the font width and returns an updated IStyle
+        /// </summary>
+        /// <param name="fontWidth">The new font width</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle FontWidth(SKFontStyleWidth fontWidth) => Update(fontWidth: fontWidth);
 
         /// <summary>
         /// Changes the font italic setting and returns an updated IStyle
@@ -177,6 +183,34 @@ namespace Topten.RichTextKit
         public IStyle TextColor(SKColor textColor) => Update(textColor: textColor);
 
         /// <summary>
+        /// Changes the background color and returns an updated IStyle
+        /// </summary>
+        /// <param name="backgroundColor">The new background color</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle BackgroundColor(SKColor backgroundColor) => Update(backgroundColor: backgroundColor);
+
+        /// <summary>
+        /// Changes the halo color and returns an updated IStyle
+        /// </summary>
+        /// <param name="haloColor">The new halo color</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle HaloColor(SKColor haloColor) => Update(haloColor: haloColor);
+
+        /// <summary>
+        /// Changes the halo width and returns an updated IStyle
+        /// </summary>
+        /// <param name="haloWidth">The new halo width</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle HaloWidth(float haloWidth) => Update(haloWidth: haloWidth);
+
+        /// <summary>
+        /// Changes the halo blur width and returns an updated IStyle
+        /// </summary>
+        /// <param name="haloBlur">The new halo blur width</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle HaloBlur(float haloBlur) => Update(haloBlur: haloBlur);
+
+        /// <summary>
         /// Changes the character spacing and returns an updated IStyle
         /// </summary>
         /// <param name="letterSpacing">The new character spacing</param>
@@ -197,6 +231,13 @@ namespace Topten.RichTextKit
         /// <returns>An IStyle for the new style</returns>
         public IStyle TextDirection(TextDirection textDirection) => Update(textDirection: textDirection);
 
+        /// <summary>
+        /// Changes the text direction and returns an updated IStyle
+        /// </summary>
+        /// <param name="character">The new replacement character</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle ReplacementCharacter(char character) => Update(replacementCharacter: character);
+
 
         /// <summary>
         /// Update the current style by applying one or more changes to the current
@@ -205,44 +246,62 @@ namespace Topten.RichTextKit
         /// <param name="fontFamily">The new font family</param>
         /// <param name="fontSize">The new font size</param>
         /// <param name="fontWeight">The new font weight</param>
+        /// <param name="fontWidth">The new font width</param>
         /// <param name="fontItalic">The new font italic</param>
         /// <param name="underline">The new underline style</param>
         /// <param name="strikeThrough">The new strike-through style</param>
         /// <param name="lineHeight">The new line height</param>
         /// <param name="textColor">The new text color</param>
+        /// <param name="backgroundColor">The new text color</param>
+        /// <param name="haloColor">The new text color</param>
+        /// <param name="haloWidth">The new halo width</param>
+        /// <param name="haloBlur">The new halo blur width</param>
         /// <param name="letterSpacing">The new letterSpacing</param>
         /// <param name="fontVariant">The new font variant</param>
         /// <param name="textDirection">The new text direction</param>
+        /// <param name="replacementCharacter">The new replacement character</param>
         /// <returns>An IStyle for the new style</returns>
         public IStyle Update(
                string fontFamily = null,
                float? fontSize = null,
                int? fontWeight = null,
+               SKFontStyleWidth? fontWidth = null,
                bool? fontItalic = null,
                UnderlineStyle? underline = null,
                StrikeThroughStyle? strikeThrough = null,
                float? lineHeight = null,
                SKColor? textColor = null,
+               SKColor? backgroundColor = null,
+               SKColor? haloColor = null,
+               float? haloWidth = null,
+               float? haloBlur = null,
                float? letterSpacing = null,
                FontVariant? fontVariant = null,
-               TextDirection? textDirection = null
+               TextDirection? textDirection = null,
+               char? replacementCharacter = null
             )
         {
             // Resolve new style against current style
             var rFontFamily = fontFamily ?? _currentStyle.FontFamily;
             var rFontSize = fontSize ?? _currentStyle.FontSize;
             var rFontWeight = fontWeight ?? _currentStyle.FontWeight;
+            var rFontWidth = fontWidth ?? _currentStyle.FontWidth;
             var rFontItalic = fontItalic ?? _currentStyle.FontItalic;
             var rUnderline = underline ?? _currentStyle.Underline;
             var rStrikeThrough = strikeThrough ?? _currentStyle.StrikeThrough;
             var rLineHeight = lineHeight ?? _currentStyle.LineHeight;
             var rTextColor = textColor ?? _currentStyle.TextColor;
+            var rBackgroundColor = backgroundColor ?? _currentStyle.BackgroundColor;
+            var rHaloColor = haloColor ?? _currentStyle.HaloColor;
+            var rHaloWidth = haloWidth ?? _currentStyle.HaloWidth;
+            var rHaloBlur = haloBlur ?? _currentStyle.HaloBlur;
             var rLetterSpacing = letterSpacing ?? _currentStyle.LetterSpacing;
             var rFontVariant = fontVariant ?? _currentStyle.FontVariant;
             var rTextDirection = textDirection ?? _currentStyle.TextDirection;
+            var rReplacementCharacter = replacementCharacter ?? _currentStyle.ReplacementCharacter;
 
             // Format key
-            var key = $"{rFontFamily}.{rFontSize}.{rFontWeight}.{rFontItalic}.{rUnderline}.{rStrikeThrough}.{rLineHeight}.{rTextColor}.{rLetterSpacing}.{rFontVariant}.{rTextDirection}";
+            var key = $"{rFontFamily}.{rFontSize}.{rFontWeight}.{fontWidth}.{rFontItalic}.{rUnderline}.{rStrikeThrough}.{rLineHeight}.{rTextColor}.{rBackgroundColor}.{rHaloColor}.{rHaloWidth}.{rHaloBlur}.{rLetterSpacing}.{rFontVariant}.{rTextDirection}.{rReplacementCharacter}";
 
             // Look up...
             if (!_styleMap.TryGetValue(key, out var style))
@@ -254,14 +313,20 @@ namespace Topten.RichTextKit
                     FontFamily = rFontFamily,
                     FontSize = rFontSize,
                     FontWeight = rFontWeight,
+                    FontWidth = rFontWidth,
                     FontItalic = rFontItalic,
                     Underline = rUnderline,
                     StrikeThrough = rStrikeThrough,
                     LineHeight = rLineHeight,
                     TextColor = rTextColor,
+                    BackgroundColor = rBackgroundColor,
+                    HaloColor = rHaloColor,
+                    HaloWidth = rHaloWidth,
+                    HaloBlur = rHaloBlur,
                     LetterSpacing = rLetterSpacing,
                     FontVariant = rFontVariant,
                     TextDirection = rTextDirection,
+                    ReplacementCharacter = rReplacementCharacter,
                 };
 
                 // Seal it

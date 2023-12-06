@@ -35,6 +35,11 @@ import: "../.common.page"
     <h2 id="properties">Properties</h2>
     <table class="name-description">
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.IStyle.BackgroundColor">BackgroundColor</a></td>
+                <td><p>The background color of this run.</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.IStyle.FontFamily">FontFamily</a></td>
                 <td><p>The font family for text this text run.</p>
 </td>
@@ -61,6 +66,26 @@ font; otherwise False.</p>
 </td>
             </tr>
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.IStyle.FontWidth">FontWidth</a></td>
+                <td><p>The font weight for text in this run.</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.IStyle.HaloBlur">HaloBlur</a></td>
+                <td><p>Blur of halo</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.IStyle.HaloColor">HaloColor</a></td>
+                <td><p>Color of the halo</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.IStyle.HaloWidth">HaloWidth</a></td>
+                <td><p>Width of halo</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.IStyle.LetterSpacing">LetterSpacing</a></td>
                 <td><p>Extra spacing between each character</p>
 </td>
@@ -68,6 +93,11 @@ font; otherwise False.</p>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.IStyle.LineHeight">LineHeight</a></td>
                 <td><p>The line height for text in this run as a multiplier (defaults to 1)</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.IStyle.ReplacementCharacter">ReplacementCharacter</a></td>
+                <td><p>Specifies a replacement character to be displayed (password mode)</p>
 </td>
             </tr>
             <tr>

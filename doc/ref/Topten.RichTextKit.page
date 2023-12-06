@@ -9,6 +9,13 @@ import: "../.common.page"
     <h2 id="classes">Classes</h2>
     <table class="name-description">
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.FontFallback"> FontFallback</a></td>
+                <td><p>Helper to split a run of code points based on a particular typeface
+into a series of runs where unsupported code points are mapped to a
+fallback font.</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.FontMapper"> FontMapper</a></td>
                 <td><p>The FontMapper class is responsible for mapping style typeface information
 to an SKTypeface.</p>
@@ -39,6 +46,11 @@ information for a run of text.</p>
 </td>
             </tr>
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyledText"> StyledText</a></td>
+                <td><p>Represents a block of formatted, laid out and measurable text</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.StyleManager"> StyleManager</a></td>
                 <td><p>Helper class for managing RichTextKit styles.</p>
 </td>
@@ -47,6 +59,11 @@ information for a run of text.</p>
                 <td><a href="./../ref/Topten.RichTextKit.StyleRun"> StyleRun</a></td>
                 <td><p>Represets a style run - a logical run of characters all with the same
 style.</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.SwapHelper"> SwapHelper</a></td>
+                <td><p>Helper class to swap two values</p>
 </td>
             </tr>
             <tr>
@@ -69,6 +86,11 @@ style.</p>
     <h2 id="interfaces">Interfaces</h2>
     <table class="name-description">
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.ICharacterMatcher"> ICharacterMatcher</a></td>
+                <td><p>Provides a mechanism to override the default font fallback character matching</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.IStyle"> IStyle</a></td>
                 <td><p>Provides styling information for a run of text.</p>
 </td>
@@ -80,13 +102,28 @@ style.</p>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.CaretInfo"> CaretInfo</a></td>
                 <td><p>Used to return caret positioning information from the
-<a href="./../ref/Topten.RichTextKit.TextBlock.GetCaretInfo">TextBlock.GetCaretInfo(int)</a> method.</p>
+<a href="./../ref/Topten.RichTextKit.TextBlock.GetCaretInfo">TextBlock.GetCaretInfo(CaretPosition)</a> method.</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.CaretPosition"> CaretPosition</a></td>
+                <td><p>Stores state information about a caret position</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.FontFallback.Run"> FontFallback.Run</a></td>
+                <td><p>Specified details about a font fallback run</p>
 </td>
             </tr>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.HitTestResult"> HitTestResult</a></td>
                 <td><p>Used to return hit test information from the
 <a href="./../ref/Topten.RichTextKit.TextBlock.HitTest">TextBlock.HitTest(float, float)</a> method.</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.TextRange"> TextRange</a></td>
+                <td><p>Represents a range of code points in a text document</p>
 </td>
             </tr>
     </table>

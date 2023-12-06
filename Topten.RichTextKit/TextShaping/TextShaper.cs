@@ -191,6 +191,11 @@ namespace Topten.RichTextKit
             public float Descent;
 
             /// <summary>
+            /// The leading of the font
+            /// </summary>
+            public float Leading;
+
+            /// <summary>
             /// The XMin for the font
             /// </summary>
             public float XMin;
@@ -200,6 +205,59 @@ namespace Topten.RichTextKit
         /// Over scale used for all font operations
         /// </summary>
         const int overScale = 512;
+
+
+
+        /// <summary>
+        /// Shape an array of utf-32 code points replacing each grapheme cluster with a replacement character
+        /// </summary>
+        /// <param name="bufferSet">A re-usable text shaping buffer set that results will be allocated from</param>
+        /// <param name="codePoints">The utf-32 code points to be shaped</param>
+        /// <param name="style">The user style for the text</param>
+        /// <param name="clusterAdjustment">A value to add to all reported cluster numbers</param>
+        /// <returns>A TextShaper.Result representing the shaped text</returns>
+        public Result ShapeReplacement(ResultBufferSet bufferSet, Slice<int> codePoints, IStyle style, int clusterAdjustment)
+        {
+            var clusters = GraphemeClusterAlgorithm.GetBoundaries(codePoints).ToArray();
+            var glyph = _typeface.GetGlyph(style.ReplacementCharacter);
+            var font = new SKFont(_typeface, overScale);
+            float glyphScale = style.FontSize / overScale;
+
+            float[] widths = new float[1];
+            SKRect[] bounds = new SKRect[1];
+            font.GetGlyphWidths((new ushort[] { glyph }).AsSpan(), widths.AsSpan(), bounds.AsSpan());
+
+            var r = new Result();
+            r.GlyphIndicies = bufferSet.GlyphIndicies.Add((int)clusters.Length-1, false);
+            r.GlyphPositions = bufferSet.GlyphPositions.Add((int)clusters.Length-1, false);
+            r.Clusters = bufferSet.Clusters.Add((int)clusters.Length-1, false);
+            r.CodePointXCoords = bufferSet.CodePointXCoords.Add(codePoints.Length, false);
+            r.CodePointXCoords.Fill(0);
+
+            float xCoord = 0;
+            for (int i = 0; i < clusters.Length-1; i++)
+            {
+                r.GlyphPositions[i].X = xCoord * glyphScale;
+                r.GlyphPositions[i].Y = 0;
+                r.GlyphIndicies[i] = codePoints[clusters[i]] == 0x2029 ? (ushort)0 : glyph;
+                r.Clusters[i] = clusters[i] + clusterAdjustment;
+
+                for (int j = clusters[i]; j < clusters[i + 1]; j++)
+                {
+                    r.CodePointXCoords[j] = r.GlyphPositions[i].X;
+                }
+
+                xCoord += widths[0] + style.LetterSpacing / glyphScale; 
+            }
+
+            // Also return the end cursor position
+            r.EndXCoord = new SKPoint(xCoord * glyphScale, 0);
+            
+            ApplyFontMetrics(ref r, style.FontSize);
+
+            return r;
+        }
+
 
         /// <summary>
         /// Shape an array of utf-32 code points
@@ -247,7 +305,7 @@ namespace Topten.RichTextKit
             using (var buffer = new HarfBuzzSharp.Buffer())
             {
                 // Setup buffer
-                buffer.AddUtf32(new ReadOnlySpan<int>(codePoints.Underlying, codePoints.Start, codePoints.Length), 0, -1);
+                buffer.AddUtf32(codePoints.AsSpan(), 0, -1);
 
                 // Setup directionality (if supplied)
                 switch (direction)
@@ -332,6 +390,20 @@ namespace Topten.RichTextKit
                     cursorX += pos.XAdvance * glyphScale;
                     cursorY += pos.YAdvance * glyphScale;
 
+                    // Ensure paragraph separator character (0x2029) has some
+                    // width so it can be seen as part of the selection in the editor.
+                    if (pos.XAdvance == 0 && codePoints[(int)gi[i].Cluster] == 0x2029)
+                    {
+                        cursorX += style.FontSize * 2 / 3;
+                    }
+
+                    // Ensure paragraph separator character (0x2029) has some
+                    // width so it can be seen as part of the selection in the editor.
+                    if (pos.XAdvance == 0 && codePoints[(int)gi[i].Cluster] == 0x2029)
+                    {
+                        cursorX += style.FontSize * 2 / 3;
+                    }
+
                     // don't apply LetterSpacing if the character has no XAdvance
                     bool characterDoesntAdvance = gp[i].XAdvance == 0;
 
@@ -407,13 +479,20 @@ namespace Topten.RichTextKit
                 r.EndXCoord = new SKPoint(cursorX, cursorY);
 
                 // And some other useful metrics
-                r.Ascent = _fontMetrics.Ascent * style.FontSize / overScale;
-                r.Descent = _fontMetrics.Descent * style.FontSize / overScale;
-                r.XMin = _fontMetrics.XMin * style.FontSize / overScale;
+                ApplyFontMetrics(ref r, style.FontSize);
 
                 // Done
                 return r;
             }
+        }
+
+        private void ApplyFontMetrics(ref Result result, float fontSize)
+        {
+            // And some other useful metrics
+            result.Ascent = _fontMetrics.Ascent * fontSize / overScale;
+            result.Descent = _fontMetrics.Descent * fontSize / overScale;
+            result.Leading = _fontMetrics.Leading * fontSize / overScale;
+            result.XMin = _fontMetrics.XMin * fontSize / overScale;
         }
 
         private static Blob GetHarfBuzzBlob(SKStreamAsset asset)

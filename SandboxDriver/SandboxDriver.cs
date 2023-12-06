@@ -11,8 +11,8 @@ namespace SandboxDriver
             FontMapper.Default = new SandboxFontMapper();
         }
 
-        public int ContentModeCount = 13;
-        public int ContentMode = 0;
+        public int ContentModeCount = 15;
+        public int ContentMode = 13;
         public TextDirection BaseDirection = TextDirection.LTR;
         public TextAlignment TextAlignment = TextAlignment.Auto;
         public float Scale = 1.0f;
@@ -20,7 +20,10 @@ namespace SandboxDriver
         public bool UseMaxHeight = false;
         public bool ShowMeasuredSize = false;
 
-        TextBlock _textBlock = new TextBlock();
+        TextBlock _textBlock = new TextBlock()
+        {
+            //MaxLines = 2
+        };
 
         public void Render(SKCanvas canvas, float canvasWidth, float canvasHeight)
         {
@@ -49,10 +52,12 @@ namespace SandboxDriver
             }
 
             //string typefaceName = "Times New Roman";
-            string typefaceName = "Segoe UI";
+            string typefaceName = "Arial";
+            //string typefaceName = "Segoe UI";
             //string typefaceName = "Segoe Script";
 
             var styleNormal = new Style() { FontFamily = typefaceName, FontSize = 18 * Scale };
+            var stylePassword = styleNormal.Modify(replacementCharacter: '*');
             var styleSmall = styleNormal.Modify(fontSize: 12 * Scale);
             var styleScript = styleNormal.Modify(fontFamily: "Segoe Script");
             var styleHeading = styleNormal.Modify(fontSize: 24 * Scale, fontWeight: 700);
@@ -63,11 +68,14 @@ namespace SandboxDriver
             var styleStrike = styleNormal.Modify(strikeThrough: StrikeThroughStyle.Solid);
             var styleSubScript = styleNormal.Modify(fontVariant: FontVariant.SubScript);
             var styleSuperScript = styleNormal.Modify(fontVariant: FontVariant.SuperScript);
+            var styleCondensed = styleNormal.Modify(fontWidth: SKFontStyleWidth.Condensed);
+            var styleExpanded = styleNormal.Modify(fontWidth: SKFontStyleWidth.Expanded);
             var styleItalic = styleNormal.Modify(fontItalic: true);
             var styleBoldLarge = styleNormal.Modify(fontSize: 28 * Scale, fontWeight: 700);
             var styleRed = styleNormal.Modify(textColor: new SKColor(0xFFFF0000));
             var styleBlue = styleNormal.Modify(textColor: new SKColor(0xFF0000FF));
-            var styleFontAwesome = new Style() { FontFamily = "FontAwesome", FontSize = 24 * Scale};
+            var styleFontAwesome = new Style() { FontFamily = "FontAwesome", FontSize = 24 * Scale };
+            var styleHalo = styleNormal.Modify(haloColor: SKColors.Gray, haloWidth: 5, haloBlur: 0);
 
 
             _textBlock.Clear();
@@ -97,22 +105,30 @@ namespace SandboxDriver
                     _textBlock.AddText("2", styleSubScript);
                     _textBlock.AddText("O), ", styleNormal);
                     _textBlock.AddText("colored ", styleRed);
-                    _textBlock.AddText("text", styleBlue);
+                    _textBlock.AddText("text, ", styleBlue);
+                    _textBlock.AddText("condensed", styleCondensed);
+                    _textBlock.AddText(" and ", styleNormal);
+                    _textBlock.AddText("expanded", styleExpanded);
                     _textBlock.AddText(" and ", styleNormal);
                     _textBlock.AddText("mixed ", styleNormal);
                     _textBlock.AddText("sizes", styleSmall);
                     _textBlock.AddText(" and ", styleNormal);
                     _textBlock.AddText("fonts", styleScript);
                     _textBlock.AddText(".\n\n", styleNormal);
-                    _textBlock.AddText("Font fallback means emojis work: 🌐 🍪 🍕 🚀 and ", styleNormal);
+                    _textBlock.AddText("Font fallback means emojis work: 🙍‍♀️ 🌐 🍪 🍕 🚀 and ", styleNormal);
                     _textBlock.AddText("text shaping and bi-directional text support means complex scripts and languages like Arabic: مرحبا بالعالم, Japanese: ハローワールド, Chinese: 世界您好 and Hindi: हैलो वर्ल्ड are rendered correctly!\n\n", styleNormal);
                     _textBlock.AddText("RichTextKit also supports left/center/right text alignment, word wrapping, truncation with ellipsis place-holder, text measurement, hit testing, painting a selection range, caret position & shape helpers.", styleNormal);
+                    _textBlock.AddText(".\n\n", styleNormal);
+                    _textBlock.AddText("RichTextKit ", styleHalo);
+                    styleHalo = styleHalo.Modify(haloColor: SKColors.Red, haloWidth: 2, haloBlur: 0);
+                    _textBlock.AddText("also", styleHalo);
+                    styleHalo = styleHalo.Modify(haloColor: SKColors.Green, haloWidth: 2, haloBlur: 1);
+                    _textBlock.AddText(" supports ", styleHalo);
+                    styleHalo = styleHalo.Modify(fontWeight: 700, haloColor: SKColors.Blue, haloWidth: 5, haloBlur: 5);
+                    _textBlock.AddText("halo.", styleHalo);
                     break;
 
                 case 1:
-                    _textBlock.AddText("\n\n", styleNormal);
-                    //_textBlock.AddEllipsis();
-                    /*
                     _textBlock.AddText("Hello Wor", styleNormal);
                     _textBlock.AddText("ld", styleRed);
                     _textBlock.AddText(". This is normal 18px. These are emojis: 🌐 🍪 🍕 🚀 🏴‍☠️", styleNormal);
@@ -129,7 +145,6 @@ namespace SandboxDriver
                     _textBlock.AddText("हालाँकि प्रचलित रूप पूज", styleNormal);
                     _textBlock.AddText(", Han: ", styleNormal);
                     _textBlock.AddText("緳 踥踕", styleNormal);
-                    */
                     break;
 
                 case 2:
@@ -222,7 +237,15 @@ namespace SandboxDriver
                     _textBlock.AddText("   🌐 🍪 🍕 🚀 🏴‍☠️ xxx\n", styleFixedPitch);
                     _textBlock.AddText("   🌐 🍪 🍕 🚀    xxx\n", styleFixedPitch);
                     _textBlock.AddText("   🌐🍪🍕🚀       xxx\n", styleFixedPitch);
+                    break;
 
+                case 13:
+                    _textBlock.AddText("再起動に問題がある場合は次のオプションを使用して、通常の起動機能を無効にし\n制御を回復することをお勧めします。", styleNormal);
+                    break;
+
+                case 14:
+                    //_textBlock.AddText("Password \nAnother \n", stylePassword);
+                    _textBlock.AddText("Hello World\u2029", styleNormal);
                     break;
             }
 
@@ -234,6 +257,9 @@ namespace SandboxDriver
             var options = new TextPaintOptions()
             {
                 SelectionColor = new SKColor(0x60FF0000),
+                Hinting = Hinting,
+                Edging = Edging,
+                SubpixelPositioning = SubpixelPositioning,
             };
 
             HitTestResult? htr = null;
@@ -243,11 +269,13 @@ namespace SandboxDriver
                 htr = _textBlock.HitTest(_hitTestX - margin, _hitTestY - margin);
                 if (htr.Value.OverCodePointIndex >= 0)
                 {
-                    options.SelectionStart = htr.Value.OverCodePointIndex;
-                    options.SelectionEnd = _textBlock.CaretIndicies[_textBlock.LookupCaretIndex(htr.Value.OverCodePointIndex) + 1];
+                    options.Selection = new TextRange(
+                        htr.Value.OverCodePointIndex,
+                        _textBlock.CaretIndicies[_textBlock.LookupCaretIndex(htr.Value.OverCodePointIndex) + 1]
+                        );
                 }
 
-                ci = _textBlock.GetCaretInfo(htr.Value.ClosestCodePointIndex);
+                ci = _textBlock.GetCaretInfo(new CaretPosition(htr.Value.ClosestCodePointIndex));
             }
 
             if (ShowMeasuredSize)
@@ -307,7 +335,7 @@ namespace SandboxDriver
                 }
             }
 
-            var state = $"Size: {width} x {height} Base Direction: {BaseDirection} Alignment: {TextAlignment} Content: {ContentMode} scale: {Scale} time: {elapsed}";
+            var state = $"Size: {width} x {height} Base Direction: {BaseDirection} Alignment: {TextAlignment} Content: {ContentMode} scale: {Scale} time: {elapsed} subpixel: {SubpixelPositioning} hinting: {Hinting} edging: {Edging}";
             canvas.DrawText(state, margin, 20, new SKPaint()
             {
                 Typeface = SKTypeface.FromFamilyName("Arial"),
@@ -315,7 +343,10 @@ namespace SandboxDriver
                 IsAntialias = true,
             });
 
-            state = $"Selection: {options.SelectionStart}-{options.SelectionEnd} Closest: {(htr.HasValue ? htr.Value.ClosestCodePointIndex.ToString() : "-")}";
+            if (options.Selection.HasValue)
+                state = $"Selection: {options.Selection.Value.Start}-{options.Selection.Value.End} Closest: {(htr.HasValue ? htr.Value.ClosestCodePointIndex.ToString() : "-")}";
+            else
+                state = $"Selection: none";
             canvas.DrawText(state, margin, 40, new SKPaint()
             {
                 Typeface = SKTypeface.FromFamilyName("Arial"),
@@ -335,6 +366,10 @@ namespace SandboxDriver
         float _hitTestX;
         float _hitTestY;
         bool _showHitTest;
+
+        public SKFontEdging Edging = SKFontEdging.Antialias;
+        public SKFontHinting Hinting = SKFontHinting.Normal;
+        public bool SubpixelPositioning = true;
 
         public void HitTest(float x, float y)
         {

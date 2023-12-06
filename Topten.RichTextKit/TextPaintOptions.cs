@@ -15,10 +15,6 @@
 
 using SkiaSharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Topten.RichTextKit
 {
@@ -31,7 +27,7 @@ namespace Topten.RichTextKit
         /// Constructs a new text paint options
         /// </summary>
         public TextPaintOptions()
-        { 
+        {
         }
 
 
@@ -45,33 +41,16 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
-        /// An optional code point index of the start of a selection range.
+        /// An optional TextRange to painted as selected.
         /// </summary>
-        /// <remarks>
-        /// Both start and end selection need to be set for selection
-        /// painting to occur.  Coordinates are in utf-16 characters
-        /// </remarks>
-        public int? SelectionStart
+        public TextRange? Selection
         {
             get;
             set;
         }
 
         /// <summary>
-        /// An optional code point index of the end of a selection range.
-        /// </summary>
-        /// <remarks>
-        /// Both start and end selection need to be set for selection
-        /// painting to occur.  Coordinates are in utf-16 characters
-        /// </remarks>
-        public int? SelectionEnd
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// The color to draw selection background with.
+        /// The color to be used for the selection background.
         /// </summary>
         public SKColor SelectionColor
         {
@@ -80,22 +59,76 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
-        /// Controls whether text is rendered with anti-aliasing.
+        /// The color to be used for touch screen selection handles
         /// </summary>
-        public bool IsAntialias
+        public SKColor SelectionHandleColor
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Scaling of the touch screen selection handles
+        /// </summary>
+        /// <remarks>
+        /// Sets the scaling of the selection handles.  This can be used
+        /// to keep the selection handle size consistent even if zooming in
+        /// on rendered text.  Set to zero to disable selection handles
+        /// </remarks>
+        public float SelectionHandleScale
+        {
+            get;
+            set;
+        } = 0;
+
+        /// <summary>
+        /// Controls how font edges are drawn
+        /// </summary>
+        public SKFontEdging Edging
+        {
+            get;
+            set;
+        } = SKFontEdging.Antialias;
+
+
+        /// <summary>
+        /// Requests text be drawn at sub-pixel offsets
+        /// </summary>
+        public bool SubpixelPositioning
         {
             get;
             set;
         } = true;
 
         /// <summary>
+        /// Controls whether text is rendered with anti-aliasing.
+        /// </summary>
+        [Obsolete("Use Edging property instead of IsAntialias")]
+        public bool IsAntialias
+        {
+            get => Edging != SKFontEdging.Alias;
+            set => Edging = value ? SKFontEdging.Antialias : SKFontEdging.Alias;
+        }
+
+        /// <summary>
         /// Controls whether text is rendered using LCD sub-pixel rendering.
         /// </summary>
+        [Obsolete("Use Edging property instead of LcdRenderText")]
         public bool LcdRenderText
+        {
+            get => Edging == SKFontEdging.SubpixelAntialias;
+            set => Edging = value ? SKFontEdging.SubpixelAntialias : SKFontEdging.Antialias;
+        }
+
+
+        /// <summary>
+        /// Controls the font hint used when rendering text
+        /// </summary>
+        public SKFontHinting Hinting
         {
             get;
             set;
-        } = false;
+        } = SKFontHinting.Normal;
 
         /// <summary>
         /// A default set of paint options that renders text blocks without 

@@ -22,7 +22,7 @@ import: "../.common.page"
 <p>Controls whether text is rendered using LCD sub-pixel rendering.</p>
 
 
-<pre class="language-csharp"><code class="language-csharp">public bool LcdRenderText { get; set; }</code></pre>
+<pre class="language-csharp"><code class="language-csharp">[Obsolete(&quot;Use Edging property instead of LcdRenderText&quot;)]&#xD;&#xA;public bool LcdRenderText { get; set; }</code></pre>
 
 
 <h2 id="property-type">Property Type</h2>    <table class="name-description">

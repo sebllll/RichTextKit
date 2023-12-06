@@ -1,7 +1,9 @@
 {
     "major": 0,
-    "minor": 2,
-    "build": 123,
+    "minor": 4,
+    "build": 166,
+    "suffix": "",
     "copyrightYear": 2019,
-    "productName": "Topten.RichTextKit"
+    "productName": "Topten.RichTextKit",
+    "companyName": "Topten Software"
 }

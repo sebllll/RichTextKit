@@ -50,7 +50,7 @@ a particular style and then popping back to the previous style.</p>
     <table class="name-description">
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.StyleManager.Default">Default</a></td>
-                <td><p>The default style manager instance</p>
+                <td><p>A per-thread style manager</p>
 </td>
             </tr>
     </table>
@@ -71,6 +71,11 @@ a particular style and then popping back to the previous style.</p>
 
     <h2 id="methods">Methods</h2>
     <table class="name-description">
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.BackgroundColor">BackgroundColor(SkiaSharp.SKColor)</a></td>
+                <td><p>Changes the background color and returns an updated IStyle</p>
+</td>
+            </tr>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.StyleManager.Bold">Bold(bool)</a></td>
                 <td><p>Changes the font weight and returns an update IStyle (short cut to FontWeight)</p>
@@ -102,8 +107,28 @@ a particular style and then popping back to the previous style.</p>
 </td>
             </tr>
             <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.FontWidth">FontWidth(SkiaSharp.SKFontStyleWidth)</a></td>
+                <td><p>Changes the font width and returns an updated IStyle</p>
+</td>
+            </tr>
+            <tr>
                 <td><a href="./../ref/Topten.RichTextKit.StyleManager.FromStyle">FromStyle(IStyle)</a></td>
                 <td><p>Get a style that matches all the style attributes of the supplied style</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.HaloBlur">HaloBlur(float)</a></td>
+                <td><p>Changes the halo blur width and returns an updated IStyle</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.HaloColor">HaloColor(SkiaSharp.SKColor)</a></td>
+                <td><p>Changes the halo color and returns an updated IStyle</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.HaloWidth">HaloWidth(float)</a></td>
+                <td><p>Changes the halo width and returns an updated IStyle</p>
 </td>
             </tr>
             <tr>
@@ -124,6 +149,11 @@ a particular style and then popping back to the previous style.</p>
             <tr>
                 <td><a href="./../ref/Topten.RichTextKit.StyleManager.Push">Push()</a></td>
                 <td><p>Saves the current state on an internal stack</p>
+</td>
+            </tr>
+            <tr>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.ReplacementCharacter">ReplacementCharacter(char)</a></td>
+                <td><p>Changes the text direction and returns an updated IStyle</p>
 </td>
             </tr>
             <tr>
@@ -153,7 +183,7 @@ Push/Pop style stack to empty.</p>
 </td>
             </tr>
             <tr>
-                <td><a href="./../ref/Topten.RichTextKit.StyleManager.Update">Update(string, Nullable&lt;float&gt;, Nullable&lt;int&gt;, Nullable&lt;bool&gt;, Nullable&lt;UnderlineStyle&gt;, Nullable&lt;StrikeThroughStyle&gt;, Nullable&lt;float&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;float&gt;, Nullable&lt;FontVariant&gt;, Nullable&lt;TextDirection&gt;)</a></td>
+                <td><a href="./../ref/Topten.RichTextKit.StyleManager.Update">Update(string, Nullable&lt;float&gt;, Nullable&lt;int&gt;, Nullable&lt;SkiaSharp.SKFontStyleWidth&gt;, Nullable&lt;bool&gt;, Nullable&lt;UnderlineStyle&gt;, Nullable&lt;StrikeThroughStyle&gt;, Nullable&lt;float&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;SkiaSharp.SKColor&gt;, Nullable&lt;float&gt;, Nullable&lt;float&gt;, Nullable&lt;float&gt;, Nullable&lt;FontVariant&gt;, Nullable&lt;TextDirection&gt;, Nullable&lt;char&gt;)</a></td>
                 <td><p>Update the current style by applying one or more changes to the current
 style.</p>
 </td>

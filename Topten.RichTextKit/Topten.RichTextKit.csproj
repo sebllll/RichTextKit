@@ -1,47 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../common.props" />
+  <Import Project="../buildtools/Topten.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net45</TargetFrameworks>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
-    <Authors>Topten Software</Authors>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.1;net462;net5.0</TargetFrameworks>
+  </PropertyGroup>
+   
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <TtsCodeSign>True</TtsCodeSign>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/toptensoftware/richtextkit</PackageProjectUrl>
     <PackageIcon>nuget-icon.png</PackageIcon>
     <PackageTags>rich text, rich, text, Skia, SkiaSharp, Font</PackageTags>
     <Description>Easy to use rich text rendering for SkiaSharp, including font-fallback, bi-directional text support and more...</Description>
-    <Company>Topten Software</Company>
-    <GenerateFullPaths>True</GenerateFullPaths>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.1|AnyCPU'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <RepositoryUrl>https://github.com/toptensoftware/richtextkit</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\BidiData.trie" />
-    <None Remove="Resources\LineBreakClasses.trie" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\BidiData.trie" />
-    <EmbeddedResource Include="Resources\LineBreakClasses.trie" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="1.68.0" />
-    <PackageReference Include="HarfBuzzSharp" Version="2.6.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-      <None Include="../Artwork/nuget-icon.png" Pack="true" PackagePath=""/>
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="2.8.2.3" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.3" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.3" />
   </ItemGroup>
 
 </Project>
