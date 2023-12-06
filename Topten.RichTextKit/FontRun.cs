@@ -830,10 +830,10 @@ namespace Topten.RichTextKit
             Line = null;
             _textBlob = null;
             _font = null;
-            r._paint?.Dispose();
-            r._paint = null;
-            r._paintHalo?.Dispose();
-            r._paintHalo = null;
+            _paint?.Dispose();
+            _paint = null;
+            _paintHalo?.Dispose();
+            _paintHalo = null;
         }
 
         internal static ThreadLocal<ObjectPool<FontRun>> Pool = new ThreadLocal<ObjectPool<FontRun>>(() => new ObjectPool<FontRun>()

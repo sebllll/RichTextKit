@@ -61,7 +61,7 @@ namespace Topten.RichTextKit.Editor
         }
 
         /// <inheritdoc />
-        public override void Paint(SKCanvas canvas, TextPaintOptions options) => _textBlock.Paint(canvas, new SKPoint(ContentXCoord, ContentYCoord), options);
+        public override void Paint(SKCanvas canvas, TextPaintOptions options) => _textBlock.Paint(canvas, new SKPoint(ContentXCoord, ContentYCoord), (float)1.0, options);
         
         /// <inheritdoc />
         public override CaretInfo GetCaretInfo(CaretPosition position) => _textBlock.GetCaretInfo(position);
