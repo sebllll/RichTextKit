@@ -257,7 +257,7 @@ namespace Topten.RichTextKit
         public RichString Paragraph()
         {
             // End the previous paragraph with a carriage return
-            Add("\n");
+            //Add("\n");
 
             // Start new paragraph
             _paragraphs.Add(new ParagraphInfo(_paragraphs[_paragraphs.Count - 1]));

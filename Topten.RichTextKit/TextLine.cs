@@ -160,17 +160,14 @@ namespace Topten.RichTextKit
         /// Paint this line
         /// </summary>
         /// <param name="ctx">The paint context</param>
+        /// <param name="alpha">a global alpha factor</param>
         internal void Paint(PaintTextContext ctx, float alpha)
         {
             foreach (var r in Runs)
             {
-                r.PaintBackground(ctx);
+                r.PaintBackground(ctx, alpha);
             }
             
-            foreach (var r in Runs)
-            {
-                r.PaintBackground(ctx);
-            }
             
             foreach (var r in Runs)
             {

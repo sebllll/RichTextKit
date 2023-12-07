@@ -18,6 +18,8 @@ using HarfBuzzSharp;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Net.NetworkInformation;
 using System.Threading;
 using Topten.RichTextKit.Utils;
 
@@ -171,6 +173,11 @@ namespace Topten.RichTextKit
         /// cached SKPaint
         /// </summary>
         private SKPaint _paintHalo;
+
+        /// <summary>
+        /// cached SKPaint
+        /// </summary>
+        private SKPaint _paintBackground;
 
         /// <summary>
         /// Get the next font run from this one
@@ -556,9 +563,26 @@ namespace Topten.RichTextKit
         /// <param name="alpha"> transparency</param>
         internal void Paint(PaintTextContext ctx, float alpha)
         {
+
             // Paint selection?
             if (ctx.PaintSelectionBackground != null && RunKind != FontRunKind.Ellipsis)
             {
+                //global alpha factor
+                if (alpha < 1.0 && alpha >= 0)
+                {
+                    byte alphaBackground = (byte)(ctx.PaintSelectionBackground.Color.Alpha * alpha);
+                    ctx.PaintSelectionBackground.Color = ctx.PaintSelectionBackground.Color.WithAlpha(alphaBackground);
+
+                    byte alphaHandle = (byte)(ctx.PaintSelectionHandle.Color.Alpha * alpha);
+                    ctx.PaintSelectionHandle.Color = ctx.PaintSelectionHandle.Color.WithAlpha(alphaHandle);
+                }
+                else
+                {
+                    ctx.PaintSelectionBackground.Color = ctx.PaintSelectionBackground.Color;
+                    ctx.PaintSelectionHandle.Color = ctx.PaintSelectionHandle.Color;
+
+                }
+
                 bool paintStartHandle = false;
                 bool paintEndHandle = false;
 
@@ -632,9 +656,10 @@ namespace Topten.RichTextKit
             if (RunKind == FontRunKind.TrailingWhitespace)
                 return;
 
-            // Text 
+            // cache Paints 
             var paint = _paint ?? (_paint = new SKPaint());
             var paintHalo = _paintHalo ?? (_paintHalo = new SKPaint());
+
             {
                 // Work out font variant adjustments
                 float glyphScale = 1;
@@ -650,14 +675,32 @@ namespace Topten.RichTextKit
                     glyphVOffset = Style.FontSize * 0.1f;
                 }
 
-                byte alphaByte = (byte)Math.Max(0, Math.Min(255, (int)Math.Floor(alpha * 256.0)));
-
                 // Setup SKPaint
-                paint.Color = Style.TextColor.WithAlpha(alphaByte);
+                if (alpha < 1.0 && alpha >= 0)
+                {
+                    //global alpha factor
+                    byte alphaPaint = (byte)(Style.TextColor.Alpha * alpha);
+                    paint.Color = Style.TextColor.WithAlpha(alphaPaint);
+                }
+                else
+                {
+                    paint.Color = Style.TextColor;
+                }
 
                 if (Style.HaloColor != SKColor.Empty)
                 {
-                    paintHalo.Color = Style.HaloColor;
+                    if (alpha < 1.0 && alpha >= 0)
+                    {
+                        byte alphaPaintHalo = (byte)(Style.HaloColor.Alpha * alpha);
+                        paintHalo.Color = Style.HaloColor.WithAlpha(alphaPaintHalo);
+
+                    }
+                    else
+                    {
+                        paintHalo.Color = Style.HaloColor;
+                    }
+
+                    
                     paintHalo.Style = SKPaintStyle.Stroke;
                     paintHalo.StrokeWidth = Style.HaloWidth;
                     paintHalo.StrokeCap = SKStrokeCap.Square;
@@ -705,13 +748,16 @@ namespace Topten.RichTextKit
                         // Paint underline
                         if (Style.Underline != UnderlineStyle.None && RunKind == FontRunKind.Normal)
                         {
+
+                            float VLScaleFactor = 0.1f;
+
                             // Work out underline metrics
                             float underlineYPos = Line.YCoord + Line.BaseLine + (_font.Metrics.UnderlinePosition ?? 0);
-                            if (underlineYPos < Line.YCoord + Line.BaseLine + 1)
-                                underlineYPos = Line.YCoord + Line.BaseLine + 1;
+                            if (underlineYPos < Line.YCoord + Line.BaseLine + 1 * VLScaleFactor)
+                                underlineYPos = Line.YCoord + Line.BaseLine + 1 * VLScaleFactor;
                             paint.StrokeWidth = _font.Metrics.UnderlineThickness ?? 1;
-                            if (paint.StrokeWidth < 1)
-                                paint.StrokeWidth = 1;
+                            if (paint.StrokeWidth < 1 * VLScaleFactor)
+                                paint.StrokeWidth = 1 * VLScaleFactor;
                             paintHalo.StrokeWidth = paint.StrokeWidth + Style.HaloWidth;
 
                             if (Style.Underline == UnderlineStyle.Gapped)
@@ -805,16 +851,34 @@ namespace Topten.RichTextKit
         /// Paint background of this font run
         /// </summary>
         /// <param name="ctx"></param>
-        internal void PaintBackground(PaintTextContext ctx)
+        /// <param name="alpha"></param>
+        internal void PaintBackground(PaintTextContext ctx, float alpha)
         {
+            var paintBackground = _paintBackground ?? (_paintBackground = new SKPaint());
+
+            // Setup SKPaint
+            if (alpha < 1.0 && alpha >= 0)
+            {
+                byte alphaPaintBackground = (byte)(Style.BackgroundColor.Alpha * alpha);
+                paintBackground.Color = Style.BackgroundColor.WithAlpha(alphaPaintBackground);
+                paintBackground.Style = SKPaintStyle.Fill;
+            }
+            else
+            {
+                paintBackground.Color = Style.BackgroundColor;
+                paintBackground.Style = SKPaintStyle.Fill;
+            }
+
+
             if (Style.BackgroundColor != SKColor.Empty && RunKind == FontRunKind.Normal)
             {
                 var rect = new SKRect(XCoord , Line.YCoord, 
                     XCoord + Width, Line.YCoord + Line.Height);
-                using (var skPaint = new SKPaint {Style = SKPaintStyle.Fill, Color = Style.BackgroundColor})
-                {
-                    ctx.Canvas.DrawRect(rect, skPaint);
-                }
+                //using (var skPaint = new SKPaint {Style = SKPaintStyle.Fill, Color = Style.BackgroundColor})
+                //{
+                //ctx.Canvas.DrawRect(rect, skPaint);
+                //}
+                ctx.Canvas.DrawRect(rect, paintBackground); 
             }            
         }
 
