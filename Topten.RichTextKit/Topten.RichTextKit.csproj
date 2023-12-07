@@ -2,22 +2,21 @@
 
   <Import Project="../buildtools/Topten.props" />
 
-  <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
-  </PropertyGroup>
+
+
+
+	<PropertyGroup>
+		<BaseOutputPath>../../../lib/$(TargetFramework)/$(Configuration)/</BaseOutputPath>
+		<OutputPath>../../../lib/$(TargetFramework)/$(Configuration)/</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DocumentationFile>../../../lib/$(TargetFramework)/$(Configuration)/Topten.RichTextKit.xml</DocumentationFile>
+		
+		<TargetFrameworks>net6.0</TargetFrameworks>
+	</PropertyGroup>
    
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <TtsCodeSign>True</TtsCodeSign>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/toptensoftware/richtextkit</PackageProjectUrl>
-    <PackageIcon>nuget-icon.png</PackageIcon>
-    <PackageTags>rich text, rich, text, Skia, SkiaSharp, Font</PackageTags>
-    <Description>Easy to use rich text rendering for SkiaSharp, including font-fallback, bi-directional text support and more...</Description>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <RepositoryUrl>https://github.com/toptensoftware/richtextkit</RepositoryUrl>
-  </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="2.8.2.3" />
