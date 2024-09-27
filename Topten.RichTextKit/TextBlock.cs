@@ -465,6 +465,65 @@ namespace Topten.RichTextKit
         /// </summary>
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="options">Options controlling the paint operation</param>
+        public void Paint(SKCanvas canvas, TextPaintOptions options = null)
+        {
+            // Ensure have options
+            if (options == null)
+                options = TextPaintOptions.Default;
+
+            // Ensure layout done
+            Layout();
+
+            // Create context
+            var ctx = new PaintTextContext()
+            {
+                Canvas = canvas,
+                Options = options,
+            };
+
+            // Prepare selection
+            if (options.Selection.HasValue)
+            {
+                ctx.SelectionStart = options.Selection.Value.Minimum;
+                ctx.SelectionEnd = options.Selection.Value.Maximum;
+                ctx.PaintSelectionBackground = new SKPaint()
+                {
+                    Color = options.SelectionColor,
+                    IsStroke = false,
+                    IsAntialias = false,
+                };
+                if (options.SelectionHandleScale != 0 && options.SelectionHandleColor.Alpha > 0)
+                {
+                    ctx.SelectionHandleScale = options.SelectionHandleScale;
+                    ctx.PaintSelectionHandle = new SKPaint()
+                    {
+                        Color = options.SelectionHandleColor,
+                        IsStroke = false,
+                        IsAntialias = true,
+                    };
+                }
+            }
+            else
+            {
+                ctx.SelectionStart = -1;
+                ctx.SelectionEnd = -1;
+            }
+
+            // Paint each line
+            foreach (var l in _lines)
+            {
+                l.Paint(ctx);
+            }
+
+            // Clean up
+            ctx.PaintSelectionBackground?.Dispose();
+        }
+
+        /// <summary>
+        /// Paint this text block
+        /// </summary>
+        /// <param name="canvas">The Skia canvas to paint to</param>
+        /// <param name="options">Options controlling the paint operation</param>
         /// <param name="alpha"> transparency</param>
         public void Paint(SKCanvas canvas, float alpha, TextPaintOptions options = null)
         {
@@ -518,6 +577,26 @@ namespace Topten.RichTextKit
 
             // Clean up
             ctx.PaintSelectionBackground?.Dispose();
+        }
+
+        /// <summary>
+        /// Paint this text block
+        /// </summary>
+        /// <param name="canvas">The Skia canvas to paint to</param>
+        /// <param name="position">The top left position within the canvas to draw at</param>
+        /// <param name="options">Options controlling the paint operation</param>
+        /// <param name="alpha">transparency</param>
+        public void Paint(SKCanvas canvas, SKPoint position, TextPaintOptions options = null)
+        {
+            // Translate
+            canvas.Save();
+            canvas.Translate(position.X, position.Y);
+
+            // Paint it
+            Paint(canvas, options);
+
+            // Restore and done!
+            canvas.Restore();
         }
 
         /// <summary>
