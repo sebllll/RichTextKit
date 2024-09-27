@@ -397,7 +397,10 @@ namespace Topten.RichTextKit
                         cursorX += style.FontSize * 2 / 3;
                     }
 
-                    if (i+1 == gi.Length || gi[i].Cluster != gi[i+1].Cluster)
+                    // don't apply LetterSpacing if the character has no XAdvance
+                    bool characterDoesntAdvance = gp[i].XAdvance == 0;
+
+                    if (!characterDoesntAdvance && (i + 1 == gi.Length || gi[i].Cluster != gi[i+1].Cluster))
                     {
                         cursorX += style.LetterSpacing;
                     }

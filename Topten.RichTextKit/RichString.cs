@@ -257,7 +257,7 @@ namespace Topten.RichTextKit
         public RichString Paragraph()
         {
             // End the previous paragraph with a carriage return
-            Add("\n");
+            //Add("\n");
 
             // Start new paragraph
             _paragraphs.Add(new ParagraphInfo(_paragraphs[_paragraphs.Count - 1]));
@@ -387,6 +387,65 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 173 (the default unicode SoftHyphen)
+        /// </remarks>
+        public int? SoftHyphenCharacter
+        {
+            get => _softHyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value > 0)
+                {
+                    _softHyphenCharacter = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Character that is being used as Hyphen.
+        /// When Hyphenation should take place, the <see cref="SoftHyphenCharacter"/> gets replaced with this one
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default Glyphinfo for a Hyphen)
+        /// </remarks>
+        public ushort? HyphenCharacter
+        {
+            get => _hyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value > 0)
+                {
+                    _hyphenCharacter = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Characters Width that is being used as Hyphen.
+        /// When Hyphenation should take place, the <see cref="SoftHyphenCharacter"/> gets replaced with this one
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default Glyphinfo for a Hyphen)
+        /// </remarks>
+        public float? HyphenCharacterWidth
+        {
+            get => _hyphenCharacterWidth;
+            set
+            {
+                if (value.HasValue && value.Value > 0)
+                {
+                    _hyphenCharacterWidth = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
         /// The maximum number of lines after which lines will be 
         /// truncated and the final line will be appended with an 
         /// ellipsis (`...`) character.
@@ -488,11 +547,13 @@ namespace Topten.RichTextKit
         /// </summary>
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="options">Options controlling the paint operation</param>
+        /// <param name="alpha">transparency</param>
         public void Paint(
             SKCanvas canvas,
+            float alpha,
             TextPaintOptions options = null)
         {
-            Paint(canvas, SKPoint.Empty, options);
+            Paint(canvas, SKPoint.Empty, alpha, options);
         }
 
         /// <summary>
@@ -501,9 +562,11 @@ namespace Topten.RichTextKit
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="position">The top left position within the canvas to draw at</param>
         /// <param name="options">Options controlling the paint operation</param>
+        /// <param name="alpha">transparency</param>
         public void Paint(
         SKCanvas canvas,
         SKPoint position,
+        float alpha,
         TextPaintOptions options = null)
         {
             Layout();
@@ -519,7 +582,7 @@ namespace Topten.RichTextKit
 
             foreach (var p in _paragraphs)
             {
-                p.Paint(ref ctx);
+                p.Paint(ref ctx, alpha);
             }
         }
 
@@ -560,6 +623,30 @@ namespace Topten.RichTextKit
             {
                 Layout();
                 return _measuredWidth;
+            }
+        }
+
+        /// <summary>
+        /// retrieve the measurements for each paragraph in a Richstring
+        /// </summary>
+        /// <param name="doLayout"></param>
+        /// <param name="ParagraphWidths"></param>
+        /// <param name="ParagraphHeights"></param>
+        public void MeasureParagraphs(bool doLayout, out List<float> ParagraphWidths, out List<float> ParagraphHeights)
+        {
+            if (doLayout)
+                Layout();
+
+            ParagraphWidths = new List<float>();
+            ParagraphHeights = new List<float>();
+            foreach (var p in _paragraphs)
+            {
+                if (p.TextBlock != null)
+                {
+                    ParagraphWidths.Add(p.TextBlock.MeasuredWidth);
+                    ParagraphHeights.Add(p.TextBlock.MeasuredHeight + p.MarginTop + p.MarginBottom);
+
+                }
             }
         }
 
@@ -800,6 +887,9 @@ namespace Topten.RichTextKit
                 baseDirection = _baseDirection,
                 styleManager = StyleManager.Default.Value,
                 previousParagraph = null,
+                softHyphenCharacter = _softHyphenCharacter,
+                hyphenCharacter = _hyphenCharacter,
+                hyphenCharacterWidth = _hyphenCharacterWidth
             };
 
             // Setup style manager
@@ -859,6 +949,9 @@ namespace Topten.RichTextKit
             public ParagraphInfo previousParagraph;
             public int MeasuredLength;
             public int TotalLength;
+            public int? softHyphenCharacter;
+            public ushort? hyphenCharacter;
+            public float? hyphenCharacterWidth;
         }
 
 
@@ -881,6 +974,9 @@ namespace Topten.RichTextKit
         float? _maxHeight;
         int? _maxLines;
         bool _ellipsisEnabled = true;
+        int? _softHyphenCharacter;
+        ushort? _hyphenCharacter;
+        float? _hyphenCharacterWidth;
         TextAlignment _textAlignment;
         TextDirection _baseDirection;
         IStyle _baseStyle;
@@ -948,7 +1044,7 @@ namespace Topten.RichTextKit
                 }
             }
 
-            public void Paint(ref PaintContext ctx)
+            public void Paint(ref PaintContext ctx, float alpha)
             {
                 if (Truncated)
                     return;
@@ -966,7 +1062,7 @@ namespace Topten.RichTextKit
 
 
                 // Paint it
-                TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), ctx.textPaintOptions);
+                TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), alpha, ctx.textPaintOptions);
 
                 // Restore selection indicies
                 if (oldSel.HasValue)
@@ -1054,6 +1150,36 @@ namespace Topten.RichTextKit
                     Truncated = true;
                     ctx.Truncated = true;
                     return;
+                }
+
+                // Setup SoftHyphenation Characters
+                if (ctx.softHyphenCharacter.HasValue)
+                {
+                    TextBlock.SoftHyphenCharacter = ctx.softHyphenCharacter.Value;
+                }
+                else
+                {
+                    TextBlock.SoftHyphenCharacter = 173;
+                }
+
+                // Setup Hyphenation Characters
+                if (ctx.hyphenCharacter.HasValue)
+                {
+                    TextBlock.HyphenCharacter = ctx.hyphenCharacter.Value;
+                }
+                else
+                {
+                    TextBlock.HyphenCharacter = 16;
+                }
+
+                // Setup Hyphenation Characters Width
+                if (ctx.hyphenCharacterWidth.HasValue)
+                {
+                    TextBlock.HyphenCharacterWidth = ctx.hyphenCharacterWidth.Value;
+                }
+                else
+                {
+                    TextBlock.HyphenCharacterWidth = 0.5f;
                 }
 
                 // Update the yPosition and stop further processing if truncated

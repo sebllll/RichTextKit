@@ -133,7 +133,7 @@ namespace RichStringSandbox
             options.SelectionHandleColor = new SKColor(0, 0, 255);
             options.SelectionHandleScale = 1;
 
-            _richString.Paint(canvas, new SKPoint(margin, margin), options);
+            _richString.Paint(canvas, 1.0f, options);
 
             if (_htr.ClosestCodePointIndex >= 0)
             {

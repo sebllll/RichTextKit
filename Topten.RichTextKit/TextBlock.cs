@@ -149,6 +149,74 @@ namespace Topten.RichTextKit
         }
 
         /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 173 (the default unicode SoftHyphen)
+        /// </remarks>
+        public int? SoftHyphenCharacter
+        {
+            get => _softHyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value < 0)
+                    value = 173;
+
+                if (value.HasValue && value != _softHyphenCharacter)
+                {
+                    _softHyphenCharacter = value.Value;
+                    InvalidateLayout();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default glyphInfo for Hyphen)
+        /// </remarks>
+        public ushort? HyphenCharacter
+        {
+            get => _hyphenCharacter;
+            set
+            {
+                if (value.HasValue && value.Value < 0)
+                    value = 16;
+
+                if (value.HasValue && value != _hyphenCharacter)
+                {
+                    _hyphenCharacter = value.Value;
+                    InvalidateLayout();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Character that is being used as SoftHyphen
+        /// </summary>
+        /// <remarks>
+        /// This property can be set to null, in which case it is set to 16 (the default glyphInfo for Hyphen)
+        /// </remarks>
+        public float? HyphenCharacterWidth
+        {
+            get => _hyphenCharacterWidth;
+            set
+            {
+                if (value.HasValue && value.Value < 0)
+                    value = 0.5f;
+
+                if (value.HasValue && value != _hyphenCharacterWidth)
+                {
+                    _hyphenCharacterWidth = value.Value;
+                    InvalidateLayout();
+                }
+            }
+        }
+
+
+
+        /// <summary>
         /// Sets the left, right or center alignment of the text block.
         /// </summary>
         /// <remarks>
@@ -361,6 +429,8 @@ namespace Topten.RichTextKit
                 // Break font runs into lines
                 BreakLines();
 
+                AdjustHyphens();
+
                 // Finalize lines
                 FinalizeLines();
             }
@@ -395,7 +465,8 @@ namespace Topten.RichTextKit
         /// </summary>
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="options">Options controlling the paint operation</param>
-        public void Paint(SKCanvas canvas, TextPaintOptions options = null)
+        /// <param name="alpha"> transparency</param>
+        public void Paint(SKCanvas canvas, float alpha, TextPaintOptions options = null)
         {
             // Ensure have options
             if (options == null)
@@ -442,7 +513,7 @@ namespace Topten.RichTextKit
             // Paint each line
             foreach (var l in _lines)
             {
-                l.Paint(ctx);
+                l.Paint(ctx, alpha);
             }
 
             // Clean up
@@ -455,14 +526,15 @@ namespace Topten.RichTextKit
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="position">The top left position within the canvas to draw at</param>
         /// <param name="options">Options controlling the paint operation</param>
-        public void Paint(SKCanvas canvas, SKPoint position, TextPaintOptions options = null)
+        /// <param name="alpha">transparency</param>
+        public void Paint(SKCanvas canvas, SKPoint position, float alpha, TextPaintOptions options = null)
         {
             // Translate
             canvas.Save();
             canvas.Translate(position.X, position.Y);
 
             // Paint it
-            Paint(canvas, options);
+            Paint(canvas, alpha, options);
 
             // Restore and done!
             canvas.Restore();
@@ -986,6 +1058,21 @@ namespace Topten.RichTextKit
         /// Option to control ellipsis
         /// </summary>
         bool _ellipsisEnabled = true;
+
+        /// <summary>
+        /// The Character that represents a SoftHyphen
+        /// </summary>
+        int _softHyphenCharacter = 173;
+
+        /// <summary>
+        /// The Character that represents a SoftHyphen
+        /// </summary>
+        ushort _hyphenCharacter = 16;
+
+        /// <summary>
+        /// The Characters Width that represents a SoftHyphen
+        /// </summary>
+        float _hyphenCharacterWidth = 0.5f;
 
         /// <summary>
         /// Text alignment
@@ -1840,6 +1927,40 @@ namespace Topten.RichTextKit
             line.Width = xPos - trailingWhitespaceWidth;
 
             return _maxWidthResolved - (xPos - trailingWhitespaceWidth);
+        }
+
+        /// <summary>
+        /// replace a given SoftHyphen Character at a lineEnd with a given Hyphen Character
+        /// Also Shift The Whole Line a bit to the left, when Centered or Right 
+        /// </summary>
+        private void AdjustHyphens()
+        {
+            for (int f = 0; f < FontRuns.Count; f++)
+            {
+                var fr = FontRuns[f];
+
+                var lastCodepoint = fr.CodePoints[fr.End - fr.Start - 1];
+
+                if (lastCodepoint == _softHyphenCharacter) // 173 is a SoftHyphen
+                {
+                    // replace the last glyph in the line with a Hyphen
+                    fr.Glyphs[fr.Glyphs.Length - 1] = _hyphenCharacter;
+
+
+                    // shift the XCoords of that line a bit to the left if TextAlignment is Right or Centered
+                    var ta = ResolveTextAlignment();
+                    switch (ta)
+                    {
+                        case TextAlignment.Center:
+                            fr.XCoord -= (_hyphenCharacterWidth + fr.Style.LetterSpacing) / 2;
+                            break;
+
+                        case TextAlignment.Right:
+                            fr.XCoord -= _hyphenCharacterWidth + fr.Style.LetterSpacing;
+                            break;
+                    }
+                }
+            }
         }
 
         /// <summary>
