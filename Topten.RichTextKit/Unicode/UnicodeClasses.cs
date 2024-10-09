@@ -23,10 +23,10 @@ namespace RichTextKit
         static UnicodeClasses()
         {
             // Load trie resources
-            _bidiTrie = new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("Topten.RichTextKit.Resources.BidiClasses.trie"));
-            _classesTrie = new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("Topten.RichTextKit.Resources.LineBreakClasses.trie"));
-            _boundaryTrie = new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("Topten.RichTextKit.Resources.WordBoundaryClasses.trie"));
-            _graphemeTrie= new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("Topten.RichTextKit.Resources.GraphemeClusterClasses.trie"));
+            _bidiTrie = new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("RichTextKit.Resources.BidiClasses.trie"));
+            _classesTrie = new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("RichTextKit.Resources.LineBreakClasses.trie"));
+            _boundaryTrie = new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("RichTextKit.Resources.WordBoundaryClasses.trie"));
+            _graphemeTrie= new UnicodeTrie(typeof(LineBreaker).Assembly.GetManifestResourceStream("RichTextKit.Resources.GraphemeClusterClasses.trie"));
         }
 
         static UnicodeTrie _bidiTrie;
