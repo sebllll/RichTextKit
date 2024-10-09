@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Provides a mechanism to override the default font fallback character matching

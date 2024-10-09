@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Topten.RichTextKit.Utils
+namespace RichTextKit.Utils
 {
     /// <summary>
     /// A simple bi-directional dictionary

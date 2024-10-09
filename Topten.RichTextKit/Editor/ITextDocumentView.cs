@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Topten.RichTextKit.Editor
+namespace RichTextKit.Editor
 {
     /// <summary>
     /// Interface implemented by views of a TextDocument

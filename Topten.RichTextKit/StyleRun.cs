@@ -19,9 +19,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Represets a style run - a logical run of characters all with the same

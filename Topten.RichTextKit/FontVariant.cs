@@ -19,7 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Describes variations to a base font for a run of text.

@@ -20,7 +20,7 @@ using System.Text;
 
 // Ported from: https://github.com/foliojs/unicode-trie
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     internal class UnicodeTrieBuilder
     {

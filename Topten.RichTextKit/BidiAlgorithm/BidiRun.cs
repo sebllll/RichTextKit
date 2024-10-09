@@ -16,9 +16,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     internal struct BidiRun
     {

@@ -19,9 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Represents a block of formatted, laid out and measurable text
@@ -585,7 +585,6 @@ namespace Topten.RichTextKit
         /// <param name="canvas">The Skia canvas to paint to</param>
         /// <param name="position">The top left position within the canvas to draw at</param>
         /// <param name="options">Options controlling the paint operation</param>
-        /// <param name="alpha">transparency</param>
         public void Paint(SKCanvas canvas, SKPoint position, TextPaintOptions options = null)
         {
             // Translate

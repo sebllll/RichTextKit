@@ -15,7 +15,7 @@
 
 using SkiaSharp;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Stores state information about a caret position

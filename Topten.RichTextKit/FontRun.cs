@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Net.NetworkInformation;
 using System.Threading;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Represents a font run - a physical sequence of laid glyphs all with
@@ -1124,6 +1124,7 @@ namespace Topten.RichTextKit
         /// Paint background of this font run
         /// </summary>
         /// <param name="ctx"></param>
+        /// <param name="alpha"> the opacity</param>
         internal void PaintBackground(PaintTextContext ctx, float alpha)
         {
             var paintBackground = _paintBackground ?? (_paintBackground = new SKPaint());

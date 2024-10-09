@@ -15,9 +15,9 @@
 
 using SkiaSharp;
 using System.Collections.Generic;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit.Editor
+namespace RichTextKit.Editor
 {
     /// <summary>
     /// Abstract base class for all TextDocument paragraphs

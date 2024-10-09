@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     class DefaultCharacterMatcher : ICharacterMatcher
     {

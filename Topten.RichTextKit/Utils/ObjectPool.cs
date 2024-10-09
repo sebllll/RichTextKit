@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Topten.RichTextKit.Utils
+namespace RichTextKit.Utils
 {
     internal class ObjectPool<T> where T : class, new()
     {

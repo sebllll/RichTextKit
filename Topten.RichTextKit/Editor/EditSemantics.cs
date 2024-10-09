@@ -15,7 +15,7 @@
 
 using SkiaSharp;
 
-namespace Topten.RichTextKit.Editor
+namespace RichTextKit.Editor
 {
     /// <summary>
     /// Defines various semantics for TextDocument edit operations

@@ -17,7 +17,7 @@ using System;
 using System.IO;
 using System.Xml.Schema;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Represents a range of code points in a text document

@@ -15,7 +15,7 @@
 
 using SkiaSharp;
 
-namespace Topten.RichTextKit.Editor
+namespace RichTextKit.Editor
 {
     /// <summary>
     /// Defines a kind of keyboard navigation

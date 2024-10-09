@@ -3,17 +3,19 @@
   <Import Project="../buildtools/Topten.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <Version>0.4.168</Version>
+    <OutputPath>..\..\..\lib\</OutputPath>
   </PropertyGroup>
    
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <TtsCodeSign>True</TtsCodeSign>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/toptensoftware/richtextkit</PackageProjectUrl>
     <PackageIcon>nuget-icon.png</PackageIcon>
-    <PackageTags>rich text, rich, text, Skia, SkiaSharp, Font</PackageTags>
+    <PackageTags>rich text, rich, text, Skia, SkiaSharp, Font, VL</PackageTags>
     <Description>Easy to use rich text rendering for SkiaSharp, including font-fallback, bi-directional text support and more...</Description>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RepositoryUrl>https://github.com/toptensoftware/richtextkit</RepositoryUrl>

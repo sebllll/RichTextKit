@@ -15,7 +15,7 @@
 //
 // Ported from: https://github.com/foliojs/linebreak
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     internal static class LineBreakPairTable
     {

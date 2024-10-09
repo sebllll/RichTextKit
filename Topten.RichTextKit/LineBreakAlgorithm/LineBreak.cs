@@ -17,7 +17,7 @@
 
 using System.Diagnostics;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Information about a potential line break position

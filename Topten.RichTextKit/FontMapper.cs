@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// The FontMapper class is responsible for mapping style typeface information

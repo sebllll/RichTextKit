@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Schema;
 
-namespace Topten.RichTextKit.Utils
+namespace RichTextKit.Utils
 {
     /// <summary>
     /// Interface to a run object with a start offset and a length

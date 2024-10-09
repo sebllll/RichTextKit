@@ -1,6 +1,6 @@
-﻿using Topten.RichTextKit.Utils;
+﻿using RichTextKit.Utils;
 
-namespace Topten.RichTextKit.Editor.UndoUnits
+namespace RichTextKit.Editor.UndoUnits
 {
     class UndoJoinParagraphs : UndoUnit<TextDocument>
     {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit.Editor.UndoUnits
+namespace RichTextKit.Editor.UndoUnits
 {
     class UndoDeleteText : UndoUnit<TextDocument>
     {

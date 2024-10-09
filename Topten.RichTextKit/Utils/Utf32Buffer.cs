@@ -18,9 +18,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit.Utils
+namespace RichTextKit.Utils
 {
     /// <summary>
     /// Represents a buffer of UTF-32 encoded code point data

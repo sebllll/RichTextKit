@@ -18,9 +18,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Topten.RichTextKit.Utils;
+using RichTextKit.Utils;
 
-namespace Topten.RichTextKit
+namespace RichTextKit
 {
     /// <summary>
     /// Implementation of the word boundary algorithm
