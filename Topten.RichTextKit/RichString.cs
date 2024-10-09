@@ -1044,33 +1044,6 @@ namespace RichTextKit
                 }
             }
 
-            public void Paint(ref PaintContext ctx)
-            {
-                if (Truncated)
-                    return;
-
-                TextRange? oldSel = null;
-                if (ctx.textPaintOptions != null)
-                {
-                    // Save old selection ranges
-                    oldSel = ctx.textPaintOptions.Selection;
-                    if (ctx.textPaintOptions.Selection.HasValue)
-                    {
-                        ctx.textPaintOptions.Selection = ctx.textPaintOptions.Selection.Value.Offset(-this.CodePointOffset);
-                    }
-                }
-
-
-                // Paint it
-                TextBlock.Paint(ctx.canvas, ctx.paintPosition + TextBlockPaintPosition(ctx.owner), ctx.textPaintOptions);
-
-                // Restore selection indicies
-                if (oldSel.HasValue)
-                {
-                    ctx.textPaintOptions.Selection = oldSel;
-                }
-            }
-
             public void Paint(ref PaintContext ctx, float alpha)
             {
                 if (Truncated)
