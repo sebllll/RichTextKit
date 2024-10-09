@@ -9,7 +9,7 @@
   </PropertyGroup>
    
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <TtsCodeSign>True</TtsCodeSign>
+    <TtsCodeSign>False</TtsCodeSign>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
