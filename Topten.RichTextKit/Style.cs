@@ -16,7 +16,7 @@
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace RichTextKit
 {
@@ -30,6 +30,12 @@ namespace RichTextKit
         {
             if (_sealed)
                 throw new InvalidOperationException("Style has been sealed and can't be modified");
+        }
+
+        public void LoadFont(string Path, string Name)
+        {
+            Stream font = File.OpenRead(Path);
+            FontMapper.LoadPrivateFont(font, Name);
         }
 
         /// <summary>
