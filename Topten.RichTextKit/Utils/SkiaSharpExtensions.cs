@@ -37,7 +37,6 @@ namespace RichTextKit.Utils
         }
     }
 
-    // Assuming SKFontArguments is a class that wraps the SkFontArguments structure
     /// <summary>
     /// Represents the font arguments for a typeface.
     /// </summary>
@@ -57,7 +56,14 @@ namespace RichTextKit.Utils
             Handle = handle;
         }
 
-        // Additional properties and methods to manipulate font arguments can be added here
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SKFontArguments"/> class.
+        /// </summary>
+        public SKFontArguments()
+        {
+            Handle = CreateHandle();
+        }
+
         /// <summary>
         /// Gets or sets the variable weight of the font.
         /// </summary>

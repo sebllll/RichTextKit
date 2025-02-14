@@ -711,7 +711,7 @@ namespace RichTextKit
                         SKTypeface typefaceToUse = Typeface;
                         if (Style.VariableFontWeight != 0 || Style.VariableFontWidth != 0 || Style.VariableFontSlant != 0)
                         {
-                            var fontArguments = new SKFontArguments(IntPtr.Zero)
+                            var fontArguments = new SKFontArguments()
                             {
                                 Weight = Style.VariableFontWeight,
                                 Width = Style.VariableFontWidth,

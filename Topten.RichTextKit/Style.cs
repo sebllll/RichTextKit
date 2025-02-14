@@ -37,7 +37,7 @@ namespace RichTextKit
         /// </summary>
         /// <param name="Path"></param>
         /// <param name="Name"></param>
-        public static void LoadFont(string Path, string Name)
+        public void LoadFont(string Path, string Name)
         {
             Stream font = File.OpenRead(Path);
             FontMapper.LoadPrivateFont(font, Name);

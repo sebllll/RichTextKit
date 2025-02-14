@@ -111,7 +111,7 @@ namespace RichTextKit
 
                 if (style.VariableFontWeight != 0 || style.VariableFontWidth != 0 || style.VariableFontSlant != 0)
                 {
-                    var fontArguments = new SKFontArguments(IntPtr.Zero)
+                    var fontArguments = new SKFontArguments()
                     {
                         Weight = style.VariableFontWeight,
                         Width = style.VariableFontWidth,
