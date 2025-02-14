@@ -68,23 +68,26 @@ namespace RichTextKit
         /// <param name="textDirection">The new text direction</param>
         /// <returns>A reference to the same RichString instance</returns>
         public RichString Add(string text,
-           string fontFamily = null,
-           float? fontSize = null,
-           int? fontWeight = null,
-           SKFontStyleWidth? fontWidth = null,
-           bool? fontItalic = null,
-           UnderlineStyle? underline = null,
-           StrikeThroughStyle? strikeThrough = null,
-           float? lineHeight = null,
-           SKColor? textColor = null,
-           SKColor? backgroundColor = null,
-           SKColor? haloColor = null,
-           float? haloWidth = null,
-           float? haloBlur = null,
-           float? letterSpacing = null,
-           FontVariant? fontVariant = null,
-           TextDirection? textDirection = null
-        )
+   string fontFamily = null,
+   float? fontSize = null,
+   int? fontWeight = null,
+   SKFontStyleWidth? fontWidth = null,
+   bool? fontItalic = null,
+   UnderlineStyle? underline = null,
+   StrikeThroughStyle? strikeThrough = null,
+   float? lineHeight = null,
+   SKColor? textColor = null,
+   SKColor? backgroundColor = null,
+   SKColor? haloColor = null,
+   float? haloWidth = null,
+   float? haloBlur = null,
+   float? letterSpacing = null,
+   FontVariant? fontVariant = null,
+   TextDirection? textDirection = null,
+   int? variableFontWeight = null,
+   int? variableFontWidth = null,
+   int? variableFontSlant = null
+)
         {
             if (string.IsNullOrEmpty(text))
                 return this;
@@ -106,6 +109,9 @@ namespace RichTextKit
             if (fontVariant.HasValue) FontVariant(fontVariant.Value);
             if (letterSpacing.HasValue) LetterSpacing(letterSpacing.Value);
             if (textDirection.HasValue) TextDirection(textDirection.Value);
+            if (variableFontWeight.HasValue) VariableFontWeight(variableFontWeight.Value);
+            if (variableFontWidth.HasValue) VariableFontWidth(variableFontWidth.Value);
+            if (variableFontSlant.HasValue) VariableFontSlant(variableFontSlant.Value);
             Add(text);
             Pop();
 
@@ -964,6 +970,9 @@ namespace RichTextKit
             Invalidate();
             return this;
         }
+        public RichString VariableFontWeight(int value) => Append(new VariableFontWeightItem(value));
+        public RichString VariableFontWidth(int value) => Append(new VariableFontWidthItem(value));
+        public RichString VariableFontSlant(int value) => Append(new VariableFontSlantItem(value));
 
         static int _nextRevision = 0;
         bool _revisionValid = false;
@@ -1529,6 +1538,50 @@ namespace RichTextKit
                 ctx.StyleManager.Underline(UnderlineStyle.None);
                 ctx.StyleManager.StrikeThrough(StrikeThroughStyle.None);
                 ctx.StyleManager.FontVariant(RichTextKit.FontVariant.Normal);
+            }
+        }
+        class VariableFontWeightItem : Item
+        {
+            public VariableFontWeightItem(int value)
+            {
+                _value = value;
+            }
+
+            int _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.VariableFontWeight(_value);
+            }
+        }
+
+        class VariableFontWidthItem : Item
+        {
+            public VariableFontWidthItem(int value)
+            {
+                _value = value;
+            }
+
+            int _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.VariableFontWidth(_value);
+            }
+        }
+
+        class VariableFontSlantItem : Item
+        {
+            public VariableFontSlantItem(int value)
+            {
+                _value = value;
+            }
+
+            int _value;
+
+            public override void Build(BuildContext ctx)
+            {
+                ctx.StyleManager.VariableFontSlant(_value);
             }
         }
 
