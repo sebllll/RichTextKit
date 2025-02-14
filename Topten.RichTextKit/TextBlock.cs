@@ -1693,6 +1693,9 @@ namespace RichTextKit
                 line.RunsInternal.Add(_fontRuns[i]);
             }
 
+            // Calculate line metrics after adding all FontRuns
+            line.CalculateLineMetrics();
+
             // Add the line to the collection
             _lines.Add(line);
 
