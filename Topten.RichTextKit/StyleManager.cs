@@ -80,10 +80,12 @@ namespace RichTextKit
             if (IsOwned(value))
                 return value;
 
-            return Update(value.FontFamily, value.FontSize, value.FontWeight, value.FontWidth, value.FontItalic,
-                            value.Underline, value.StrikeThrough, value.LineHeight, value.TextColor, value.BackgroundColor,
-                            value.HaloColor, value.HaloWidth, value.HaloBlur,
-                            value.LetterSpacing, value.FontVariant, value.TextDirection, value.ReplacementCharacter);
+            return Update(value.FontFamily, value.FontSize, value.FontWeight, value.FontWidth,
+                          value.VariableFontWeight, value.VariableFontWidth, value.VariableFontSlant,
+                          value.FontItalic, value.Underline, value.StrikeThrough, value.LineHeight,
+                          value.TextColor, value.BackgroundColor, value.HaloColor, value.HaloWidth,
+                          value.HaloBlur, value.LetterSpacing, value.FontVariant, value.TextDirection,
+                          value.ReplacementCharacter);
         }
 
         /// <summary>
@@ -146,6 +148,27 @@ namespace RichTextKit
         /// <param name="fontWidth">The new font width</param>
         /// <returns>An IStyle for the new style</returns>
         public IStyle FontWidth(SKFontStyleWidth fontWidth) => Update(fontWidth: fontWidth);
+
+        /// <summary>
+        /// Changes the variable font weight and returns an updated IStyle
+        /// </summary>
+        /// <param name="variableFontWeight">The new variable font weight</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle VariableFontWeight(int variableFontWeight) => Update(variableFontWeight: variableFontWeight);
+
+        /// <summary>
+        /// Changes the variable font width and returns an updated IStyle
+        /// </summary>
+        /// <param name="variableFontWidth">The new variable font width</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle VariableFontWidth(int variableFontWidth) => Update(variableFontWidth: variableFontWidth);
+
+        /// <summary>
+        /// Changes the variable font slant and returns an updated IStyle
+        /// </summary>
+        /// <param name="variableFontSlant">The new variable font slant</param>
+        /// <returns>An IStyle for the new style</returns>
+        public IStyle VariableFontSlant(int variableFontSlant) => Update(variableFontSlant: variableFontSlant);
 
         /// <summary>
         /// Changes the font italic setting and returns an updated IStyle
@@ -247,6 +270,9 @@ namespace RichTextKit
         /// <param name="fontSize">The new font size</param>
         /// <param name="fontWeight">The new font weight</param>
         /// <param name="fontWidth">The new font width</param>
+        /// <param name="variableFontWeight">The new variable font weight</param>
+        /// <param name="variableFontWidth">The new variable font width</param>
+        /// <param name="variableFontSlant">The new variable font slant</param>
         /// <param name="fontItalic">The new font italic</param>
         /// <param name="underline">The new underline style</param>
         /// <param name="strikeThrough">The new strike-through style</param>
@@ -266,6 +292,9 @@ namespace RichTextKit
                float? fontSize = null,
                int? fontWeight = null,
                SKFontStyleWidth? fontWidth = null,
+               int? variableFontWeight = null,
+               int? variableFontWidth = null,
+               int? variableFontSlant = null,
                bool? fontItalic = null,
                UnderlineStyle? underline = null,
                StrikeThroughStyle? strikeThrough = null,
@@ -286,6 +315,9 @@ namespace RichTextKit
             var rFontSize = fontSize ?? _currentStyle.FontSize;
             var rFontWeight = fontWeight ?? _currentStyle.FontWeight;
             var rFontWidth = fontWidth ?? _currentStyle.FontWidth;
+            var rVariableFontWeight = variableFontWeight ?? _currentStyle.VariableFontWeight;
+            var rVariableFontWidth = variableFontWidth ?? _currentStyle.VariableFontWidth;
+            var rVariableFontSlant = variableFontSlant ?? _currentStyle.VariableFontSlant;
             var rFontItalic = fontItalic ?? _currentStyle.FontItalic;
             var rUnderline = underline ?? _currentStyle.Underline;
             var rStrikeThrough = strikeThrough ?? _currentStyle.StrikeThrough;
@@ -301,7 +333,7 @@ namespace RichTextKit
             var rReplacementCharacter = replacementCharacter ?? _currentStyle.ReplacementCharacter;
 
             // Format key
-            var key = $"{rFontFamily}.{rFontSize}.{rFontWeight}.{fontWidth}.{rFontItalic}.{rUnderline}.{rStrikeThrough}.{rLineHeight}.{rTextColor}.{rBackgroundColor}.{rHaloColor}.{rHaloWidth}.{rHaloBlur}.{rLetterSpacing}.{rFontVariant}.{rTextDirection}.{rReplacementCharacter}";
+            var key = $"{rFontFamily}.{rFontSize}.{rFontWeight}.{rFontWidth}.{rVariableFontWeight}.{rVariableFontWidth}.{rVariableFontSlant}.{rFontItalic}.{rUnderline}.{rStrikeThrough}.{rLineHeight}.{rTextColor}.{rBackgroundColor}.{rHaloColor}.{rHaloWidth}.{rHaloBlur}.{rLetterSpacing}.{rFontVariant}.{rTextDirection}.{rReplacementCharacter}";
 
             // Look up...
             if (!_styleMap.TryGetValue(key, out var style))
@@ -314,6 +346,9 @@ namespace RichTextKit
                     FontSize = rFontSize,
                     FontWeight = rFontWeight,
                     FontWidth = rFontWidth,
+                    VariableFontWeight = rVariableFontWeight,
+                    VariableFontWidth = rVariableFontWidth,
+                    VariableFontSlant = rVariableFontSlant,
                     FontItalic = rFontItalic,
                     Underline = rUnderline,
                     StrikeThrough = rStrikeThrough,

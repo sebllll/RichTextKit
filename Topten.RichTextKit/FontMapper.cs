@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using RichTextKit.Utils;
 
 namespace RichTextKit
 {
@@ -100,12 +101,26 @@ namespace RichTextKit
                 }
 
                 // Get the typeface
-                return SKTypeface.FromFamilyName(
+                var typeface = SKTypeface.FromFamilyName(
                     style.FontFamily, 
                     (SKFontStyleWeight)(style.FontWeight + extraWeight), 
                     style.FontWidth, 
                     style.FontItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright
                     ) ?? SKTypeface.CreateDefault();
+
+
+                if (style.VariableFontWeight != 0 || style.VariableFontWidth != 0 || style.VariableFontSlant != 0)
+                {
+                    var fontArguments = new SKFontArguments()
+                    {
+                        Weight = style.VariableFontWeight,
+                        Width = style.VariableFontWidth,
+                        Slant = style.VariableFontSlant
+                    };
+                    typeface = typeface.MakeClone(fontArguments);
+                }
+
+                return typeface;
             }
 
             // Do default mapping

@@ -43,9 +43,24 @@ namespace RichTextKit
         int FontWeight { get; }
 
         /// <summary>
-        /// The font weight for text in this run.
+        /// The font width for text in this run.
         /// </summary>
         SKFontStyleWidth FontWidth { get; }
+
+        /// <summary>
+        /// The variable font weight for text in this run.
+        /// </summary>
+        int VariableFontWeight { get; }
+
+        /// <summary>
+        /// The variable font width for text in this run.
+        /// </summary>
+        int VariableFontWidth { get; }
+
+        /// <summary>
+        /// The variable font slant for text in this run.
+        /// </summary>
+        int VariableFontSlant { get; }
 
         /// <summary>
         /// True if the text in this run should be displayed in an italic
@@ -59,12 +74,12 @@ namespace RichTextKit
         UnderlineStyle Underline { get; }
 
         /// <summary>
-        /// The strike through style for the text in this run
+        /// The strike through style for the text in this run.
         /// </summary>
         StrikeThroughStyle StrikeThrough { get; }
 
         /// <summary>
-        /// The line height for text in this run as a multiplier (defaults to 1)
+        /// The line height for text in this run as a multiplier (defaults to 1).
         /// </summary>
         float LineHeight { get; }
 
@@ -72,29 +87,29 @@ namespace RichTextKit
         /// The text color for text in this run.
         /// </summary>
         SKColor TextColor { get; }
-        
+
         /// <summary>
         /// The background color of this run.
         /// </summary>
         SKColor BackgroundColor { get; }
 
         /// <summary>
-        /// Color of the halo
+        /// Color of the halo.
         /// </summary>
         SKColor HaloColor { get; }
 
         /// <summary>
-        /// Width of halo
+        /// Width of halo.
         /// </summary>
         float HaloWidth { get; }
 
         /// <summary>
-        /// Blur of halo
+        /// Blur of halo.
         /// </summary>
         float HaloBlur { get; }
 
         /// <summary>
-        /// Extra spacing between each character
+        /// Extra spacing between each character.
         /// </summary>
         float LetterSpacing { get; }
 
@@ -104,12 +119,12 @@ namespace RichTextKit
         FontVariant FontVariant { get; }
 
         /// <summary>
-        /// Text direction override for this span
+        /// Text direction override for this span.
         /// </summary>
         TextDirection TextDirection { get; }
 
         /// <summary>
-        /// Specifies a replacement character to be displayed (password mode)
+        /// Specifies a replacement character to be displayed (password mode).
         /// </summary>
         char ReplacementCharacter { get; }
     }

@@ -32,6 +32,11 @@ namespace RichTextKit
                 throw new InvalidOperationException("Style has been sealed and can't be modified");
         }
 
+        /// <summary>
+        /// Loads a font from a file and registers it for use in text rendering
+        /// </summary>
+        /// <param name="Path"></param>
+        /// <param name="Name"></param>
         public void LoadFont(string Path, string Name)
         {
             Stream font = File.OpenRead(Path);
@@ -83,6 +88,33 @@ namespace RichTextKit
         }
 
         /// <summary>
+        /// The variable font weight for text in this run.
+        /// </summary>
+        public int VariableFontWeight
+        {
+            get => _variableFontWeight;
+            set { CheckNotSealed(); _variableFontWeight = value; }
+        }
+
+        /// <summary>
+        /// The variable font width for text in this run.
+        /// </summary>
+        public int VariableFontWidth
+        {
+            get => _variableFontWidth;
+            set { CheckNotSealed(); _variableFontWidth = value; }
+        }
+
+        /// <summary>
+        /// The variable font slant for text in this run.
+        /// </summary>
+        public int VariableFontSlant
+        {
+            get => _variableFontSlant;
+            set { CheckNotSealed(); _variableFontSlant = value; }
+        }
+
+        /// <summary>
         /// True if the text in this run should be displayed in an italic
         /// font; otherwise False (defaults to false).
         /// </summary>
@@ -127,7 +159,7 @@ namespace RichTextKit
             get => _textColor;
             set { CheckNotSealed(); _textColor = value; }
         }
-        
+
         /// <summary>
         /// The background color of this run (no background is painted by default).
         /// </summary>
@@ -220,6 +252,9 @@ namespace RichTextKit
         float _fontSize = 16;
         int _fontWeight = 400;
         SKFontStyleWidth _fontWidth = SKFontStyleWidth.Normal;
+        private int _variableFontWeight = 0;
+        private int _variableFontWidth = 0;
+        private int _variableFontSlant = 0;
         bool _fontItalic;
         UnderlineStyle _underlineStyle;
         StrikeThroughStyle _strikeThrough;
@@ -246,6 +281,9 @@ namespace RichTextKit
         /// <param name="fontSize">The new font size</param>
         /// <param name="fontWeight">The new font weight</param>
         /// <param name="fontWidth">The new font width</param>
+        /// <param name="variableFontWeight">The new variable font weight</param>
+        /// <param name="variableFontWidth">The new variable font width</param>
+        /// <param name="variableFontSlant">The new variable font slant</param>
         /// <param name="fontItalic">The new font italic</param>
         /// <param name="underline">The new underline style</param>
         /// <param name="strikeThrough">The new strike-through style</param>
@@ -265,6 +303,9 @@ namespace RichTextKit
                float? fontSize = null,
                int? fontWeight = null,
                SKFontStyleWidth? fontWidth = null,
+               int? variableFontWeight = null,
+               int? variableFontWidth = null,
+               int? variableFontSlant = null,
                bool? fontItalic = null,
                UnderlineStyle? underline = null,
                StrikeThroughStyle? strikeThrough = null,
@@ -287,6 +328,9 @@ namespace RichTextKit
                 FontSize = fontSize ?? this.FontSize,
                 FontWeight = fontWeight ?? this.FontWeight,
                 FontWidth = fontWidth ?? this.FontWidth,
+                VariableFontWeight = variableFontWeight ?? this.VariableFontWeight,
+                VariableFontWidth = variableFontWidth ?? this.VariableFontWidth,
+                VariableFontSlant = variableFontSlant ?? this.VariableFontSlant,
                 FontItalic = fontItalic ?? this.FontItalic,
                 Underline = underline ?? this.Underline,
                 StrikeThrough = strikeThrough ?? this.StrikeThrough,

@@ -392,6 +392,30 @@ namespace RichTextKit
         }
 
         /// <summary>
+        /// Update the calculation of MaxAscent and MaxDescent
+        /// </summary>
+        internal void CalculateLineMetrics()
+        {
+            MaxAscent = 0;
+            MaxDescent = 0;
+
+            foreach (var run in Runs)
+            {
+                // Obtain font metrics considering variable font properties
+                float ascent = run.Ascent;
+                float descent = run.Descent;
+
+                if (ascent < MaxAscent)
+                    MaxAscent = ascent;
+                if (descent > MaxDescent)
+                    MaxDescent = descent;
+            }
+
+            // Recalculate text height and line height
+            Height = -MaxAscent + MaxDescent;
+        }
+
+        /// <summary>
         /// Internal List of runs
         /// </summary>
         internal List<FontRun> RunsInternal = new List<FontRun>();
